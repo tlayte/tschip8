@@ -1,46 +1,5 @@
-/// <reference path="knockout.d.ts" />
+/// <reference path=".typings/knockout.d.ts" />
 import ev = module("Events");
-
-function getNibble1(opcode: number): number {
-    return (opcode & 0xf000) >> 12;
-}
-
-function getNibble2(opcode: number): number {
-    return (opcode & 0x0f00) >> 8;
-}
-
-function getNibble3(opcode: number): number {
-    return (opcode & 0x00f0) >> 4;
-}
-
-function getNibble4(opcode: number): number {
-    return (opcode & 0x000f);
-}
-
-function toNibbles(opcode: number): number[] {
-    var nibbles = [];
-    nibbles[3] = opcode & 0xf;
-    opcode >>= 4;
-    nibbles[2] = opcode & 0xf;
-    opcode >>= 4;
-    nibbles[1] = opcode & 0xf;
-    opcode >>= 4;
-    nibbles[0] = opcode & 0xf;
-    return nibbles;
-}
-
-
-
-function fillArray(array: any[], size: number, value: any) {
-    for (var i = 0; i < size; i++) {
-        array[i] = value;
-    }
-}
-
-function zeroArray(array: number[], size: number) {
-    fillArray(array, size, 0);
-}
-
 
 export class Cpu {
 
@@ -59,12 +18,15 @@ export class Cpu {
     public debug_i = ko.observable();
     public debug_sp = ko.observable();
     public debug_stack = ko.observable();
+    public debug_next = ko.observable();
 
     public ClearScreen: ev.Event = new ev.Event();
     public DrawSprite: ev.Event = new ev.Event();
     public onWrite: ev.Event = new ev.Event();
     public onRegisterChange: ev.Event = new ev.Event();
     public onHalt: ev.Event = new ev.Event();
+    public stopSound: ev.Event = new ev.Event();
+    public startSound: ev.Event = new ev.Event();
 
     private instructions: { (data: number): void; }[] = [];
     private instructions8: { (x: number, y: number): void; }[] = [];
@@ -85,6 +47,8 @@ export class Cpu {
         this.SP = 0;
         this.delay = 0;
         this.sound = 0;
+        this.updateDebug();
+        this.stopSound.raise();
     }
 
     cycle() {
@@ -95,11 +59,22 @@ export class Cpu {
         this.updateDebug();        
     }
 
+    tick() {
+        if (this.delay > 0) {
+            this.delay--;
+        }
+        if (this.sound > 0) {
+            this.sound--;
+        } else {
+            this.stopSound.raise();
+        }
+    }
+
     private loadInstructions() {
         this.instructions[0] = function (data) => {
             switch (data) {
                 case 0x0e0:
-                    this.ClearScreen.raise(null);
+                    this.ClearScreen.raise();
                     break;
                 case 0x0ee:
                     this.PC = this.pop();
@@ -294,6 +269,9 @@ export class Cpu {
         //FX07 - set sound timer to vX
         this.instructionsF[0x18] = (x) => {
             this.sound = this.registers[x];
+            if (this.sound > 0) {
+                this.startSound.raise();
+            }
         }
 
         //FX07 - add vX to I
@@ -377,5 +355,50 @@ export class Cpu {
         this.debug_i(this.I.toString(16).toUpperCase());
         this.debug_pc(this.PC.toString(16).toUpperCase());
         this.debug_sp(this.SP.toString(16).toUpperCase());
+        this.debug_next(displayByte(this.memory[this.PC]) + displayByte(this.memory[this.PC + 1]));
     }
+}
+
+export function displayByte(byte: number): string {
+    return ("00" + byte.toString(16).toUpperCase()).substr(-2);
+}
+
+function getNibble1(opcode: number): number {
+    return (opcode & 0xf000) >> 12;
+}
+
+function getNibble2(opcode: number): number {
+    return (opcode & 0x0f00) >> 8;
+}
+
+function getNibble3(opcode: number): number {
+    return (opcode & 0x00f0) >> 4;
+}
+
+function getNibble4(opcode: number): number {
+    return (opcode & 0x000f);
+}
+
+function toNibbles(opcode: number): number[] {
+    var nibbles = [];
+    nibbles[3] = opcode & 0xf;
+    opcode >>= 4;
+    nibbles[2] = opcode & 0xf;
+    opcode >>= 4;
+    nibbles[1] = opcode & 0xf;
+    opcode >>= 4;
+    nibbles[0] = opcode & 0xf;
+    return nibbles;
+}
+
+
+
+function fillArray(array: any[], size: number, value: any) {
+    for (var i = 0; i < size; i++) {
+        array[i] = value;
+    }
+}
+
+function zeroArray(array: number[], size: number) {
+    fillArray(array, size, 0);
 }

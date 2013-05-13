@@ -1,6 +1,6 @@
 export class Event {
 
-    private handlers: { (eventArgs): void; }[] = [];
+    private handlers: { (eventArgs: any): void; }[] = [];
 
     // Constructor
     constructor() {
@@ -8,7 +8,7 @@ export class Event {
     }
 
     // Instance member
-    public raise(eventArgs: any) {
+    public raise(eventArgs: any = null) {
         this.handlers.forEach((callback) => {
             callback(eventArgs);
         });

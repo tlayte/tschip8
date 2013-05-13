@@ -3,7 +3,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>TypeScript HTML App</title>
+    <title>Chip-8</title>
     <link rel="stylesheet" href="app.css" type="text/css" />
     <script src="Scripts/jquery-2.0.0.min.js"></script>
     <script src="Scripts/knockout-2.2.1.js"></script>
@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-    <h1>TypeScript HTML App</h1>
+    <h1>Test</h1>
     <button id="startstop">Start/Stop</button>
     <button id="cycle">Cycle</button>
     <button id="reset">Reset</button>
@@ -31,6 +31,8 @@
             <li>PC: <span data-bind="text: PC"></span></li>
             <li>I : <span data-bind="text: I"></span></li>
             <li>SP: <span data-bind="text: SP"></span></li>
+            <li>next: <span data-bind="text: next"></span></li>
+            <li id="sound">Sound</li>
         </ul>
     </fieldset>
 </body>

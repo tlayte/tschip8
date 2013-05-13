@@ -6,6 +6,7 @@ define(["require", "exports"], function(require, exports) {
         }
         Event.prototype.raise = // Instance member
         function (eventArgs) {
+            if (typeof eventArgs === "undefined") { eventArgs = null; }
             this.handlers.forEach(function (callback) {
                 callback(eventArgs);
             });
