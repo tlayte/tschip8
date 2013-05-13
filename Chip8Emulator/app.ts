@@ -62,7 +62,7 @@ $(document).ready(() => {
 
 var interval = null;
 
-$("#cycle").click(() => {
+$("#startstop").click(() => {
     if (!interval) {
         interval = setInterval(() => { cpu1.cycle() }, 16);
     } else {
@@ -70,6 +70,11 @@ $("#cycle").click(() => {
         interval = null;
     }
 });
+
+$("#cycle").click(() => {
+    cpu1.cycle();
+});
+
 $("#reset").click(() => {
     cpu1.reset();
     copyProgram();

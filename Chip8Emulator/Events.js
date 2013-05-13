@@ -1,9 +1,11 @@
 define(["require", "exports"], function(require, exports) {
     var Event = (function () {
+        // Constructor
         function Event() {
             this.handlers = [];
         }
-        Event.prototype.raise = function (eventArgs) {
+        Event.prototype.raise = // Instance member
+        function (eventArgs) {
             this.handlers.forEach(function (callback) {
                 callback(eventArgs);
             });

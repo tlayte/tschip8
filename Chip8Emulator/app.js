@@ -1,4 +1,6 @@
 define(["require", "exports", "CPU"], function(require, exports, __cpu__) {
+    /// <reference path="jquery.d.ts" />
+    /// <reference path="knockout.d.ts" />
     var cpu = __cpu__;
 
     var cpu1 = new cpu.Cpu();
@@ -48,7 +50,7 @@ define(["require", "exports", "CPU"], function(require, exports, __cpu__) {
         ko.applyBindings(model);
     });
     var interval = null;
-    $("#cycle").click(function () {
+    $("#startstop").click(function () {
         if(!interval) {
             interval = setInterval(function () {
                 cpu1.cycle();
@@ -57,6 +59,9 @@ define(["require", "exports", "CPU"], function(require, exports, __cpu__) {
             clearInterval(interval);
             interval = null;
         }
+    });
+    $("#cycle").click(function () {
+        cpu1.cycle();
     });
     $("#reset").click(function () {
         cpu1.reset();
