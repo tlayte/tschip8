@@ -1,0 +1,1 @@
+{"version":3,"file":"registers.js","sources":["registers.ts"],"names":["chip8","chip8.Registers","chip8.Registers.constructor"],"mappings":"AAAA;KAAA,UAAc,KAAK;QACfA;YAAAC;AACCA,YAADA;AAACA,QAADA,CAACA,IAAAD;QADDA,4BACCA,QAAAA;IACLA,CAACA,yCAAA;IAHD;AAGC;AAAA"}

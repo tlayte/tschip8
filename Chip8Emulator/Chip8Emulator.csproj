@@ -16,22 +16,90 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".typings\jasmine.d.ts" />
+    <Content Include=".typings\require.d.ts" />
     <Content Include="app.css" />
     <Content Include="app.min.js">
       <DependentUpon>app.ts</DependentUpon>
     </Content>
-    <Content Include="jquery.d.ts" />
-    <Content Include="knockout.d.ts" />
+    <Content Include=".typings\jquery.d.ts" />
+    <Content Include=".typings\knockout.d.ts" />
+    <TypeScriptCompile Include="chip8\cpu.ts" />
+    <Content Include="chip8\cpu.js">
+      <DependentUpon>cpu.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\cpu.min.js">
+      <DependentUpon>cpu.ts</DependentUpon>
+    </Content>
+    <TypeScriptCompile Include="chip8\memory.ts" />
+    <TypeScriptCompile Include="chip8\event.ts" />
+    <Content Include="chip8\event.js">
+      <DependentUpon>event.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\event.min.js">
+      <DependentUpon>event.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\memory.js">
+      <DependentUpon>memory.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\memory.min.js">
+      <DependentUpon>memory.ts</DependentUpon>
+    </Content>
+    <Content Include="Content\jasmine\jasmine.css" />
+    <Content Include="Content\jasmine\jasmine_favicon.png" />
     <Content Include="packages.config" />
+    <Content Include="Scripts\jasmine\jasmine-html.js" />
+    <Content Include="Scripts\jasmine\jasmine.js" />
     <Content Include="Scripts\knockout-2.2.1.debug.js" />
     <Content Include="Scripts\knockout-2.2.1.js" />
+    <Content Include="chip8\cpu.js.map">
+      <DependentUpon>cpu.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\memory.js.map">
+      <DependentUpon>memory.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\jasmine\MIT.LICENSE" />
+    <Content Include="chip8\event.js.map">
+      <DependentUpon>event.ts</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-2.0.0.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.0.js" />
     <Content Include="Scripts\jquery-2.0.0.min.js" />
     <Content Include="Scripts\jquery-2.0.0.min.map" />
     <Content Include="Scripts\r.js" />
     <Content Include="Scripts\require.js" />
+    <TypeScriptCompile Include="spec\memory.spec.ts" />
+    <TypeScriptCompile Include="SpecRunner.ts" />
+    <Content Include="SpecRunner.html" />
+    <Content Include="SpecRunner.js">
+      <DependentUpon>SpecRunner.ts</DependentUpon>
+    </Content>
+    <Content Include="SpecRunner.min.js">
+      <DependentUpon>SpecRunner.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\memory.spec.js">
+      <DependentUpon>memory.spec.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\memory.spec.min.js">
+      <DependentUpon>memory.spec.ts</DependentUpon>
+    </Content>
+    <TypeScriptCompile Include="spec\registers.spec.ts" />
+    <Content Include="spec\registers.spec.js">
+      <DependentUpon>registers.spec.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\registers.spec.min.js">
+      <DependentUpon>registers.spec.ts</DependentUpon>
+    </Content>
     <Content Include="web.config" />
+    <Content Include="spec\memory.spec.js.map">
+      <DependentUpon>memory.spec.ts</DependentUpon>
+    </Content>
+    <Content Include="SpecRunner.js.map">
+      <DependentUpon>SpecRunner.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\registers.spec.js.map">
+      <DependentUpon>registers.spec.ts</DependentUpon>
+    </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

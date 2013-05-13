@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="Content/jasmine/jasmine.css" rel="stylesheet" />
+    <script src="Scripts/jasmine/jasmine.js"></script>
+    <script src="Scripts/jasmine/jasmine-html.js"></script>
+    <script>
+        var jasmineEnv = jasmine.getEnv();
+        jasmineEnv.updateInterval = 1000;
+
+        var htmlReporter = new jasmine.HtmlReporter();
+
+        jasmineEnv.addReporter(htmlReporter);
+        jasmineEnv.specFilter = function(spec) {
+            return htmlReporter.specFilter(spec);
+        };
+    </script>
+    <script data-main="SpecRunner" src="Scripts/require.js"></script>
+</head>
+<body>
+
+</body>
+</html>
