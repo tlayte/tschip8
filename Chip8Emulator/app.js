@@ -1,5 +1,6 @@
-define(["require", "exports"], function(require, exports) {
-    
+define(["require", "exports", "old/CPU"], function(require, exports, __cpu__) {
+    var cpu = __cpu__;
+
     var cpu1 = new cpu.Cpu();
     var backup;
     $(document).ready(function () {
@@ -32,10 +33,6 @@ define(["require", "exports"], function(require, exports) {
         cpu1.memory[1539] = 4;
         cpu1.memory[1540] = 5;
         cpu1.memory[524] = 23;
-        //cpu1.memory[0x700] = 0x68;
-        //cpu1.memory[0x701] = 0xf0;
-        //cpu1.memory[0x702] = 0x69;
-        //cpu1.memory[0x703] = 0x78;
         cpu1.memory[1792] = 104;
         cpu1.memory[1793] = 32;
         cpu1.memory[1794] = 105;

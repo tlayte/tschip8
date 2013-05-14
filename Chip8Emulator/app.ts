@@ -1,6 +1,6 @@
 /// <reference path=".typings/knockout.d.ts" />
 /// <reference path=".typings/jquery.d.ts" />
-import cpu = module("CPU");
+import cpu = module("old/CPU");
 
 
 

@@ -1,5 +1,4 @@
 define(["require", "exports"], function(require, exports) {
-    // Module
     (function (chip8) {
         var CPU = (function () {
             function CPU() {

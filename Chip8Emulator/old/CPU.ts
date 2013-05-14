@@ -1,5 +1,5 @@
 /// <reference path="../.typings/knockout.d.ts" />
-import ev = module("Events");
+import ev = module("old/Events");
 
 export class Cpu {
 

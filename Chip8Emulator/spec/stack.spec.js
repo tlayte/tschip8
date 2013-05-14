@@ -1,5 +1,4 @@
 define(["require", "exports", "chip8/stack"], function(require, exports, __stackModule__) {
-    /// <reference path="../.typings/jasmine.d.ts" />
     var stackModule = __stackModule__;
 
     var Chip8 = stackModule.chip8;
