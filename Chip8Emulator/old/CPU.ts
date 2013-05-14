@@ -1,4 +1,4 @@
-/// <reference path=".typings/knockout.d.ts" />
+/// <reference path="../.typings/knockout.d.ts" />
 import ev = module("Events");
 
 export class Cpu {

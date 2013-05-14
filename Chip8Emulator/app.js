@@ -1,8 +1,5 @@
-define(["require", "exports", "CPU"], function(require, exports, __cpu__) {
-    /// <reference path=".typings/knockout.d.ts" />
-    /// <reference path=".typings/jquery.d.ts" />
-    var cpu = __cpu__;
-
+define(["require", "exports"], function(require, exports) {
+    
     var cpu1 = new cpu.Cpu();
     var backup;
     $(document).ready(function () {

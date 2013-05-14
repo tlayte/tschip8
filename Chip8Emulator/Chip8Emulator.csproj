@@ -156,24 +156,24 @@
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
-    <TypeScriptCompile Include="CPU.ts" />
-    <Content Include="CPU.js">
+    <TypeScriptCompile Include="old\CPU.ts" />
+    <Content Include="old\CPU.js">
       <DependentUpon>CPU.ts</DependentUpon>
     </Content>
-    <Content Include="CPU.min.js">
+    <Content Include="old\CPU.min.js">
       <DependentUpon>CPU.ts</DependentUpon>
     </Content>
     <Content Include="default.htm" />
     <Content Include="app.js">
       <DependentUpon>app.ts</DependentUpon>
     </Content>
-    <Content Include="Events.js">
+    <Content Include="old\Events.js">
       <DependentUpon>Events.ts</DependentUpon>
     </Content>
-    <Content Include="Events.min.js">
+    <Content Include="old\Events.min.js">
       <DependentUpon>Events.ts</DependentUpon>
     </Content>
-    <TypeScriptCompile Include="Events.ts" />
+    <TypeScriptCompile Include="old\Events.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
@@ -184,12 +184,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Events.js.map">
+    <Content Include="old\Events.js.map">
       <DependentUpon>Events.ts</DependentUpon>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CPU.js.map">
+    <Content Include="old\CPU.js.map">
       <DependentUpon>CPU.ts</DependentUpon>
     </Content>
   </ItemGroup>

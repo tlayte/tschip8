@@ -1,5 +1,5 @@
 define(["require", "exports", "Events"], function(require, exports, __ev__) {
-    /// <reference path=".typings/knockout.d.ts" />
+    /// <reference path="../.typings/knockout.d.ts" />
     var ev = __ev__;
 
     var Cpu = (function () {
