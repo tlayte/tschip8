@@ -9,10 +9,13 @@ define(["require", "exports", 'chip8/event'], function(require, exports, __event
                 this.Size = Size;
                 this._memory = [];
                 this.onWrite = new Event();
+                this.reset();
+            }
+            Memory.prototype.reset = function () {
                 for(var i = 0; i < this.Size; i++) {
                     this._memory[i] = 0;
                 }
-            }
+            };
             Memory.prototype.write = function (address, value) {
                 this.checkBounds(address);
                 this._memory[address] = value;

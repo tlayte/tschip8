@@ -8,7 +8,11 @@ export module chip8 {
         public onWrite = new Event();
 
         constructor(public Size: number = 4096) {
-            for (var i = 0; i < this.Size; i++){
+            this.reset();
+        }
+
+        reset() {
+            for (var i = 0; i < this.Size; i++) {
                 this._memory[i] = 0;
             }
         }

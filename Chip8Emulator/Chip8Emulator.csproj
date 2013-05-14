@@ -45,6 +45,20 @@
     <Content Include="chip8\memory.min.js">
       <DependentUpon>memory.ts</DependentUpon>
     </Content>
+    <TypeScriptCompile Include="chip8\registers.ts" />
+    <Content Include="chip8\registers.js">
+      <DependentUpon>registers.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\registers.min.js">
+      <DependentUpon>registers.ts</DependentUpon>
+    </Content>
+    <TypeScriptCompile Include="chip8\stack.ts" />
+    <Content Include="chip8\stack.js">
+      <DependentUpon>stack.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\stack.min.js">
+      <DependentUpon>stack.ts</DependentUpon>
+    </Content>
     <Content Include="Content\jasmine\jasmine.css" />
     <Content Include="Content\jasmine\jasmine_favicon.png" />
     <Content Include="packages.config" />
@@ -61,6 +75,12 @@
     <Content Include="Scripts\jasmine\MIT.LICENSE" />
     <Content Include="chip8\event.js.map">
       <DependentUpon>event.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\registers.js.map">
+      <DependentUpon>registers.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\stack.js.map">
+      <DependentUpon>stack.ts</DependentUpon>
     </Content>
     <None Include="Scripts\jquery-2.0.0.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.0.js" />
@@ -90,6 +110,13 @@
     <Content Include="spec\registers.spec.min.js">
       <DependentUpon>registers.spec.ts</DependentUpon>
     </Content>
+    <TypeScriptCompile Include="spec\stack.spec.ts" />
+    <Content Include="spec\stack.spec.js">
+      <DependentUpon>stack.spec.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\stack.spec.min.js">
+      <DependentUpon>stack.spec.ts</DependentUpon>
+    </Content>
     <Content Include="web.config" />
     <Content Include="spec\memory.spec.js.map">
       <DependentUpon>memory.spec.ts</DependentUpon>
@@ -99,6 +126,9 @@
     </Content>
     <Content Include="spec\registers.spec.js.map">
       <DependentUpon>registers.spec.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\stack.spec.js.map">
+      <DependentUpon>stack.spec.ts</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
@@ -158,7 +188,7 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerPort>62456</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:42102/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
@@ -171,13 +201,13 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <TypeScriptTarget>ES3</TypeScriptTarget>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptIncludeComments>true</TypeScriptIncludeComments>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <TypeScriptTarget>ES3</TypeScriptTarget>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptIncludeComments>false</TypeScriptIncludeComments>
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
