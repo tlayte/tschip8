@@ -2,7 +2,8 @@
 /// <reference path=".typings/jasmine.d.ts" />
 require([
     'spec/memory.spec', 
-    'spec/registers.spec'
+    'spec/registers.spec', 
+    'spec/stack.spec'
 ], function () {
     var jasmineEnv = jasmine.getEnv();
     jasmineEnv.execute();
