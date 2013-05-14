@@ -1,5 +1,4 @@
 define(["require", "exports", 'chip8/memory'], function(require, exports, __memModule__) {
-    /// <reference path="../.typings/jasmine.d.ts" />
     var memModule = __memModule__;
 
     var Memory = memModule.chip8.Memory;
@@ -49,7 +48,7 @@ define(["require", "exports", 'chip8/memory'], function(require, exports, __memM
                         var callback = jasmine.createSpy("callback");
                         memory.onWrite.subscribe(callback);
                         memory.write(10, 200);
-                        expect(callback).toHaveBeenCalled();
+                        expect(callback).toHaveBeenCalledWith(10, 200);
                     });
                 });
                 describe('When bulk loading', function () {

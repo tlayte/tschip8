@@ -20,7 +20,7 @@ export module chip8 {
         write(address: number, value: number) {
             this.checkBounds(address);
             this._memory[address] = value;
-            this.onWrite.raise();
+            this.onWrite.raise(address, value);
         }
 
         read(address: number): number {

@@ -64,6 +64,17 @@ export module chip8.spec {
                 registers.vA = 1337;
                 expect(registers.read(0xA)).toBe(1337);
             });
+
+            it('should raise an event when writing via an alias', () => {
+                var callback = jasmine.createSpy("callback");
+                registers.onWrite.subscribe(callback);
+
+                registers.PC = 1337;
+                registers.v5 = 1234;
+                expect(callback).toHaveBeenCalledWith("PC", 1337);
+                expect(callback).toHaveBeenCalledWith(5, 1234);
+                
+            });
         });
     });
 }

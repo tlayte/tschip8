@@ -56,7 +56,7 @@ export module chip8.spec {
                 var callback = jasmine.createSpy("callback");
                 memory.onWrite.subscribe(callback);
                 memory.write(10, 200);
-                expect(callback).toHaveBeenCalled();
+                expect(callback).toHaveBeenCalledWith(10, 200);
             });
         });
 

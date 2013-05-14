@@ -5,8 +5,13 @@ define(["require", "exports"], function(require, exports) {
                 this.handlers = [];
             }
             Event.prototype.raise = function () {
+                var _this = this;
+                var params = [];
+                for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                    params[_i] = arguments[_i + 0];
+                }
                 this.handlers.forEach(function (callback) {
-                    callback(arguments);
+                    callback.apply(_this, params);
                 });
             };
             Event.prototype.subscribe = function (callback) {

@@ -1,5 +1,4 @@
 define(["require", "exports", "chip8/registers"], function(require, exports, __registersModule__) {
-    /// <reference path="../.typings/jasmine.d.ts" />
     var registersModule = __registersModule__;
 
     var Chip8 = registersModule.chip8;
@@ -53,6 +52,14 @@ define(["require", "exports", "chip8/registers"], function(require, exports, __r
                     it('should be writable via the aliases', function () {
                         registers.vA = 1337;
                         expect(registers.read(10)).toBe(1337);
+                    });
+                    it('should raise an event when writing via an alias', function () {
+                        var callback = jasmine.createSpy("callback");
+                        registers.onWrite.subscribe(callback);
+                        registers.PC = 1337;
+                        registers.v5 = 1234;
+                        expect(callback).toHaveBeenCalledWith("PC", 1337);
+                        expect(callback).toHaveBeenCalledWith(5, 1234);
                     });
                 });
             });

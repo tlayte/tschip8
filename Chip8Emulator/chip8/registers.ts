@@ -26,6 +26,7 @@ export module chip8 {
         write(address: any, value: number) {
             if (typeof address == "string") {
                 this["_" + address] = value;
+                this.onWrite.raise(address, value);
             } else {
                 super.write(address, value);
             }            

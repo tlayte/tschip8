@@ -19,7 +19,7 @@ define(["require", "exports", 'chip8/event'], function(require, exports, __event
             Memory.prototype.write = function (address, value) {
                 this.checkBounds(address);
                 this._memory[address] = value;
-                this.onWrite.raise();
+                this.onWrite.raise(address, value);
             };
             Memory.prototype.read = function (address) {
                 this.checkBounds(address);

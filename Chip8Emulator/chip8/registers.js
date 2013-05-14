@@ -26,6 +26,7 @@ define(["require", "exports", "chip8/memory"], function(require, exports, __memM
             Registers.prototype.write = function (address, value) {
                 if(typeof address == "string") {
                     this["_" + address] = value;
+                    this.onWrite.raise(address, value);
                 } else {
                     _super.prototype.write.call(this, address, value);
                 }

@@ -2,9 +2,9 @@ export module chip8 {
     export class Event {
         private handlers: { (...params: any[]): void; }[] = [];
         
-        public raise() {
+        public raise(...params: any[]) {
             this.handlers.forEach((callback) => {
-                callback(arguments);
+                callback.apply(this, params);
             });
         }
 
