@@ -13,16 +13,20 @@ define(["require", "exports"], function(require, exports) {
                     this.memory.read(nextAddress), 
                     this.memory.read(nextAddress + 1)
                 ];
+                var opcode = (data[0] << 8) | data[1];
+                var nibbles = [
+                    data[0] >> 4, 
+                    data[0] & 15, 
+                    data[1] >> 4, 
+                    data[1] & 15
+                ];
                 this.registers.PC = nextAddress + 2;
                 return {
-                    opcode: (data[0] << 8) | data[1],
-                    nibbles: [
-                        data[0] >> 4, 
-                        data[0] & 15, 
-                        data[1] >> 4, 
-                        data[1] & 15
-                    ],
-                    bytes: data
+                    opcode: opcode,
+                    nibbles: nibbles,
+                    bytes: data,
+                    NN: data[1],
+                    NNN: opcode & 4095
                 };
             };
             return Decoder;
