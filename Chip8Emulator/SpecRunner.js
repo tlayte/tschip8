@@ -2,7 +2,8 @@ require([
     'spec/memory.spec', 
     'spec/registers.spec', 
     'spec/stack.spec', 
-    'spec/decoder.spec'
+    'spec/decoder.spec', 
+    'spec/core.spec'
 ], function () {
     var jasmineEnv = jasmine.getEnv();
     jasmineEnv.execute();

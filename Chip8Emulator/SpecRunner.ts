@@ -2,7 +2,7 @@
 /// <reference path=".typings/jasmine.d.ts" />
 
 
-require(['spec/memory.spec', 'spec/registers.spec', 'spec/stack.spec', 'spec/decoder.spec'], () => {
+require(['spec/memory.spec', 'spec/registers.spec', 'spec/stack.spec', 'spec/decoder.spec', 'spec/core.spec'], () => {
     var jasmineEnv = jasmine.getEnv();
     jasmineEnv.execute();
 }, (err) => {

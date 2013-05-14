@@ -25,6 +25,13 @@
     <Content Include=".typings\jquery.d.ts" />
     <Content Include=".typings\knockout.d.ts" />
     <TypeScriptCompile Include="chip8\cpu.ts" />
+    <TypeScriptCompile Include="chip8\core.ts" />
+    <Content Include="chip8\core.js">
+      <DependentUpon>core.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\core.min.js">
+      <DependentUpon>core.ts</DependentUpon>
+    </Content>
     <Content Include="chip8\cpu.js">
       <DependentUpon>cpu.ts</DependentUpon>
     </Content>
@@ -92,6 +99,9 @@
     <Content Include="chip8\decoder.js.map">
       <DependentUpon>decoder.ts</DependentUpon>
     </Content>
+    <Content Include="chip8\core.js.map">
+      <DependentUpon>core.ts</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-2.0.0.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.0.js" />
     <Content Include="Scripts\jquery-2.0.0.min.js" />
@@ -108,6 +118,13 @@
       <DependentUpon>SpecRunner.ts</DependentUpon>
     </Content>
     <TypeScriptCompile Include="spec\decoder.spec.ts" />
+    <TypeScriptCompile Include="spec\core.spec.ts" />
+    <Content Include="spec\core.spec.js">
+      <DependentUpon>core.spec.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\core.spec.min.js">
+      <DependentUpon>core.spec.ts</DependentUpon>
+    </Content>
     <Content Include="spec\decoder.spec.js">
       <DependentUpon>decoder.spec.ts</DependentUpon>
     </Content>
@@ -149,6 +166,9 @@
     </Content>
     <Content Include="spec\decoder.spec.js.map">
       <DependentUpon>decoder.spec.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\core.spec.js.map">
+      <DependentUpon>core.spec.ts</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>

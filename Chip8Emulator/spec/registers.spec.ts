@@ -72,8 +72,7 @@ export module chip8.spec {
                 registers.PC = 1337;
                 registers.v5 = 1234;
                 expect(callback).toHaveBeenCalledWith("PC", 1337);
-                expect(callback).toHaveBeenCalledWith(5, 1234);
-                
+                expect(callback).toHaveBeenCalledWith(5, 1234);                
             });
         });
     });
