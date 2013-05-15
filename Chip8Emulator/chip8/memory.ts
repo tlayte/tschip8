@@ -13,7 +13,7 @@ export module chip8 {
 
         reset() {
             for (var i = 0; i < this.Size; i++) {
-                this._memory[i] = 0;
+                this.write(i, 0);
             }
         }
 

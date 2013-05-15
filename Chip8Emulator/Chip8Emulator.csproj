@@ -26,6 +26,13 @@
     <Content Include=".typings\knockout.d.ts" />
     <TypeScriptCompile Include="chip8\cpu.ts" />
     <TypeScriptCompile Include="chip8\core.ts" />
+    <TypeScriptCompile Include="chip8\assembler.ts" />
+    <Content Include="chip8\assembler.js">
+      <DependentUpon>assembler.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\assembler.min.js">
+      <DependentUpon>assembler.ts</DependentUpon>
+    </Content>
     <Content Include="chip8\core.js">
       <DependentUpon>core.ts</DependentUpon>
     </Content>
@@ -89,6 +96,14 @@
     </Content>
     <Content Include="css\jasmine.css" />
     <Content Include="css\jasmine_favicon.png" />
+    <TypeScriptCompile Include="NewTest.ts" />
+    <Content Include="NewTest.html" />
+    <Content Include="NewTest.js">
+      <DependentUpon>NewTest.ts</DependentUpon>
+    </Content>
+    <Content Include="NewTest.min.js">
+      <DependentUpon>NewTest.ts</DependentUpon>
+    </Content>
     <Content Include="packages.config" />
     <Content Include="lib\jasmine-html.js" />
     <Content Include="lib\jasmine.js" />
@@ -120,6 +135,9 @@
     </Content>
     <Content Include="chip8\screen.js.map">
       <DependentUpon>screen.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\assembler.js.map">
+      <DependentUpon>assembler.ts</DependentUpon>
     </Content>
     <None Include="lib\jquery-2.0.0.intellisense.js" />
     <Content Include="lib\jquery-2.0.0.js" />
@@ -170,6 +188,13 @@
     <Content Include="spec\stack.spec.min.js">
       <DependentUpon>stack.spec.ts</DependentUpon>
     </Content>
+    <TypeScriptCompile Include="spec\timers.spec.ts" />
+    <Content Include="spec\timers.spec.js">
+      <DependentUpon>timers.spec.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\timers.spec.min.js">
+      <DependentUpon>timers.spec.ts</DependentUpon>
+    </Content>
     <Content Include="web.config" />
     <Content Include="spec\memory.spec.js.map">
       <DependentUpon>memory.spec.ts</DependentUpon>
@@ -188,6 +213,12 @@
     </Content>
     <Content Include="spec\core.spec.js.map">
       <DependentUpon>core.spec.ts</DependentUpon>
+    </Content>
+    <Content Include="NewTest.js.map">
+      <DependentUpon>NewTest.ts</DependentUpon>
+    </Content>
+    <Content Include="spec\timers.spec.js.map">
+      <DependentUpon>timers.spec.ts</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>

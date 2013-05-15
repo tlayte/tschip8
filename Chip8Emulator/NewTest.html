@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Modular chip8 test</title>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <script src="lib/require.js" data-main="NewTest"></script>
+    <style>
+        body {
+            font-family: Arial;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        .debug-display {
+            width: 200px;
+            position: fixed;
+            top: 0.5em;
+            right: 0.5em;
+            border: 1px solid black;
+            padding: 0.5em;
+        }
+
+        .variables, .registers, .code {
+            list-style: none;
+            margin: 0 0 1em 0;
+            padding: 0;
+        }
+
+        .variables {
+            -moz-column-count: 2;
+            -webkit-column-count: 2;
+            column-count: 2;
+        }
+
+        .variable-label, .register-label {
+            display: inline-block;
+            width: 2em;
+            text-align: right;
+            font-weight: bold;
+            margin-right: 1em;
+        }
+
+        .register-label {
+            width: 4em;
+        }
+
+        .current {
+            color: green;
+        }
+        .code li {
+            font-size: 0.6em;
+            font-family: Consolas;
+        }
+    </style>
+</head>
+    <body>
+        <h1>New code test</h1>
+        <button class="cycle">Step</button>
+        <button class="start">Start/Stop</button>
+        <button class="reset">Reset</button>
+        <span class="sound">Sound</span>
+        <div class="debug-display">
+            <h2>Variables</h2>
+            <ul class="variables">
+                <li class="variable-0">
+                    <span class="variable-label">v0:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-1">
+                    <span class="variable-label">v1:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-2">
+                    <span class="variable-label">v2:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-3">
+                    <span class="variable-label">v3:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-4">
+                    <span class="variable-label">v4:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-5">
+                    <span class="variable-label">v5:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-6">
+                    <span class="variable-label">v6:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-7">
+                    <span class="variable-label">v7:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-8">
+                    <span class="variable-label">v8:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-9">
+                    <span class="variable-label">v9:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-10">
+                    <span class="variable-label">vA:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-11">
+                    <span class="variable-label">vB:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-12">
+                    <span class="variable-label">vC:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-13">
+                    <span class="variable-label">vD:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-14">
+                    <span class="variable-label">vE:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-15">
+                    <span class="variable-label">vF:</span>
+                    <span class="variable-value">0</span>
+                </li>
+            </ul>
+            <h2>Special registers</h2>
+            <ul class="registers">
+                <li class="variable-PC">
+                    <span class="register-label">PC:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-I">
+                    <span class="register-label">I:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-SP">
+                    <span class="register-label">SP:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-delay">
+                    <span class="register-label">DT:</span>
+                    <span class="variable-value">0</span>
+                </li>
+                <li class="variable-sound">
+                    <span class="register-label">ST:</span>
+                    <span class="variable-value">0</span>
+                </li>
+            </ul>
+            <h2>Assembled code</h2>
+            <ul class="code">
+                <li class="code-line-0"></li>
+                <li class="code-line-1"></li>
+                <li class="code-line-2 current"></li>
+                <li class="code-line-3"></li>
+                <li class="code-line-4"></li>
+            </ul>
+        </div>
+    </body>
+</html>

@@ -3,7 +3,8 @@ require([
     'spec/registers.spec', 
     'spec/stack.spec', 
     'spec/decoder.spec', 
-    'spec/core.spec'
+    'spec/core.spec', 
+    'spec/timers.spec'
 ], function () {
     var jasmineEnv = jasmine.getEnv();
     jasmineEnv.execute();

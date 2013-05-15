@@ -42,8 +42,8 @@ define(["require", "exports"], function(require, exports) {
                     this.registers.PC += 2;
                 }
             };
-            Core.prototype.iSkipXYEqual = function (instruction) {
-                if(this.registers.read(instruction.nibbles[1]) === this.registers.read(instruction.nibbles[2])) {
+            Core.prototype.iSkipXYNotEqual = function (instruction) {
+                if(this.registers.read(instruction.nibbles[1]) !== this.registers.read(instruction.nibbles[2])) {
                     this.registers.PC += 2;
                 }
             };
@@ -203,7 +203,7 @@ define(["require", "exports"], function(require, exports) {
                 this.instructions8[0x6] = this.iShiftXRightWithCarry;
                 this.instructions8[0x7] = this.iSubXfromYWithBorrow;
                 this.instructions8[0xE] = this.iShiftXLeftWithCarry;
-                this.instructions[0x9] = this.iSkipXYEqual;
+                this.instructions[0x9] = this.iSkipXYNotEqual;
                 this.instructions[0xA] = this.iSetI;
                 this.instructions[0xB] = this.iJmpWithAdd;
                 this.instructions[0xC] = this.iRandInX;

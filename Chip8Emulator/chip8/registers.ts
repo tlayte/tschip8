@@ -12,8 +12,8 @@ export module chip8 {
 
         reset() {
             super.reset();
-            this._PC = 0x200;
-            this._I = 0;
+            this.PC = 0x200;
+            this.I = 0;
         }
 
         read(address: any): number {

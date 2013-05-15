@@ -13,7 +13,7 @@ define(["require", "exports", 'chip8/event'], function(require, exports, __event
             }
             Memory.prototype.reset = function () {
                 for(var i = 0; i < this.Size; i++) {
-                    this._memory[i] = 0;
+                    this.write(i, 0);
                 }
             };
             Memory.prototype.write = function (address, value) {

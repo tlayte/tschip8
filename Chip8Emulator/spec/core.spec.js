@@ -189,7 +189,7 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
                     expect(registers.write).toHaveBeenCalledWith(0xf, 0);
                     expect(registers.write).toHaveBeenCalledWith(2, 0x08);
                 });
-                it('should execute the 9XY0 - skip if X equal Y instruction', function () {
+                it('should execute the 9XY0 - skip if X not equal Y instruction', function () {
                     registers.fakeValues({
                         1: 0x2f,
                         2: 0x2f,
@@ -197,10 +197,10 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
                         "PC": 0x200
                     });
                     core.execute(createInstruction(0x91, 0x20));
-                    expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
+                    expect(registers.write).not.toHaveBeenCalledWith("PC", 0x202);
                     registers.write.reset();
                     core.execute(createInstruction(0x91, 0x30));
-                    expect(registers.write).not.toHaveBeenCalledWith("PC", 0x202);
+                    expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
                 });
                 it('should execute the ANNN - set I to NNN instruction', function () {
                     var instruction = createInstruction(0xA1, 0xFD);
@@ -363,7 +363,9 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
                 data2
             ],
             NN: data2,
-            NNN: ((data1 << 8) | data2) & 0xFFF
+            NNN: ((data1 << 8) | data2) & 0xFFF,
+            X: data1 & 0xf,
+            Y: data2 >> 4
         };
     }
     function createStackSpy() {
