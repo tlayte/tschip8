@@ -2,6 +2,8 @@ import decoderModule = module("chip8/decoder");
 import registerModule = module("chip8/registers");
 import stackModule = module("chip8/stack");
 import memoryModule = module("chip8/memory");
+import timersModule = module("chip8/timers");
+import screenModule = module("chip8/screen");
 
 export module chip8 {
     export class Core {
@@ -9,12 +11,22 @@ export module chip8 {
         private instructions8 = [];
         private instructionsF = [];
 
-        constructor(public registers: registerModule.chip8.Registers, public stack: stackModule.chip8.Stack, public memory: memoryModule.chip8.Memory) {
+        constructor(
+                public registers: registerModule.chip8.Registers,
+                public stack: stackModule.chip8.Stack,
+                public memory: memoryModule.chip8.Memory,
+                public timers: timersModule.chip8.Timers,
+                public screen: screenModule.chip8.Screen
+                ) {
             this.mapInstructions();
         }
 
         execute(instruction: decoderModule.chip8.Instruction) {
             this.instructions[instruction.nibbles[0]].call(this,instruction);
+        }
+
+        private iClearScreen(instruction: decoderModule.chip8.Instruction) {
+            this.screen.clear();
         }
 
         private iRet(instruction: decoderModule.chip8.Instruction) {
@@ -176,8 +188,43 @@ export module chip8 {
             this.registers.I = this.registers.read(instruction.nibbles[1]) * 5;
         }
 
+        private iSetXToDelay(instruction: decoderModule.chip8.Instruction) {
+            this.registers.write(instruction.nibbles[1], this.timers.delay);
+        }
+
+        private iSetDelayToX(instruction: decoderModule.chip8.Instruction) {
+            this.timers.delay = this.registers.read(instruction.nibbles[1]);
+        }
+
+        private iSetSoundToX(instruction: decoderModule.chip8.Instruction) {
+            this.timers.sound = this.registers.read(instruction.nibbles[1]);
+        }
+
+        private branch0(instruction: decoderModule.chip8.Instruction) {
+            switch (instruction.NN) {
+                case 0xE0:
+                    this.iClearScreen(instruction);
+                    break;
+                case 0xEE:
+                    this.iRet(instruction);
+                    break;
+                default:
+                    console.log("Error");
+            }
+        }
+
+        private iDrawSprite(instruction: decoderModule.chip8.Instruction) {
+            var sprite = [];
+            var addr = this.registers.I;
+            for (var i = 0; i < instruction.nibbles[3]; i++){
+                sprite.push(this.memory.read(addr + i));
+            }
+            this.screen.draw(this.registers.read(instruction.nibbles[1]), this.registers.read(instruction.nibbles[2]), sprite);
+        }
+
+
         private mapInstructions() {
-            this.instructions[0x0] = this.iRet;
+            this.instructions[0x0] = this.branch0;
             this.instructions[0x1] = this.iJmp;
             this.instructions[0x2] = this.iCall;
             this.instructions[0x3] = this.iSkipEqual;
@@ -199,8 +246,12 @@ export module chip8 {
             this.instructions[0xA] = this.iSetI;
             this.instructions[0xB] = this.iJmpWithAdd;
             this.instructions[0xC] = this.iRandInX;
+            this.instructions[0xD] = this.iDrawSprite;
 
             this.instructions[0xF] = this.branchF;
+            this.instructionsF[0x07] = this.iSetXToDelay;
+            this.instructionsF[0x15] = this.iSetDelayToX;
+            this.instructionsF[0x18] = this.iSetSoundToX;
             this.instructionsF[0x1E] = this.iAddXtoI;
             this.instructionsF[0x29] = this.iLoadFontAddress;
             this.instructionsF[0x33] = this.iBCD;

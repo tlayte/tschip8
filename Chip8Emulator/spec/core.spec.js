@@ -10,30 +10,34 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
                 var registers;
                 var memory;
                 var stack;
+                var timers;
+                var screen;
                 beforeEach(function () {
                     registers = createRegisterSpy();
                     stack = createStackSpy();
                     memory = createMemorySpy();
-                    core = new Chip8.Core(registers, stack, memory);
+                    timers = createTimersSpy();
+                    screen = createScreenSpy();
+                    core = new Chip8.Core(registers, stack, memory, timers, screen);
                 });
-                it('should execute the 00E0 - return instruction', function () {
-                    var instruction = createInstruction(0x00, 0xE0);
+                it('should execute the 00E0 - clear screen instruction', function () {
+                    core.execute(createInstruction(0x00, 0xE0));
+                    expect(screen.clear).toHaveBeenCalled();
+                });
+                it('should execute the 00EE - return instruction', function () {
                     stack.pop.andReturn(0x600);
-                    core.execute(instruction);
-                    expect(stack.pop).toHaveBeenCalled();
+                    core.execute(createInstruction(0x00, 0xEE));
                     expect(registers.write).toHaveBeenCalledWith("PC", 0x600);
                 });
                 it('should execute the 1NNN - jmp instruction', function () {
-                    var instruction = createInstruction(0x1F, 0x63);
-                    core.execute(instruction);
+                    core.execute(createInstruction(0x1F, 0x63));
                     expect(registers.write).toHaveBeenCalledWith("PC", 0xF63);
                 });
                 it('should execute the 2NNN - call instruction', function () {
-                    var instruction = createInstruction(0x23, 0x2F);
                     registers.fakeValues({
                         "PC": 0x210
                     });
-                    core.execute(instruction);
+                    core.execute(createInstruction(0x23, 0x2F));
                     expect(registers.write).toHaveBeenCalledWith("PC", 0x32F);
                     expect(stack.push).toHaveBeenCalledWith(0x210);
                 });
@@ -221,6 +225,48 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
                     expect(registers.write).toHaveBeenCalledWith(1, 0x09);
                     Math.random = oldRand;
                 });
+                it('should execute the DXYN - draw sprite instruction', function () {
+                    var expectedSprite = [
+                        0xF0, 
+                        0x90, 
+                        0x90, 
+                        0x90, 
+                        0xF0
+                    ];
+                    memory.fakeValues({
+                        1792: 0xF0,
+                        1793: 0x90,
+                        1794: 0x90,
+                        1795: 0x90,
+                        1796: 0xF0
+                    });
+                    registers.fakeValues({
+                        1: 10,
+                        2: 25,
+                        "I": 0x700
+                    });
+                    core.execute(createInstruction(0xD1, 0x25));
+                    expect(screen.draw).toHaveBeenCalledWith(10, 25, expectedSprite);
+                });
+                it('should execute the FX07 - set X to delay timer instruction', function () {
+                    timers.getDelay.andReturn(0xD5);
+                    core.execute(createInstruction(0xF3, 0x07));
+                    expect(registers.write).toHaveBeenCalledWith(3, 0xd5);
+                });
+                it('should execute the FX15 - set delay timer to X instruction', function () {
+                    registers.fakeValues({
+                        1: 0xF6
+                    });
+                    core.execute(createInstruction(0xF1, 0x15));
+                    expect(timers.setDelay).toHaveBeenCalledWith(0xf6);
+                });
+                it('should execute the FX18 - set sound timer to X instruction', function () {
+                    registers.fakeValues({
+                        7: 0x2b
+                    });
+                    core.execute(createInstruction(0xF7, 0x18));
+                    expect(timers.setSound).toHaveBeenCalledWith(0x2b);
+                });
                 it('should execute the FX1E - Add vX to I instruction', function () {
                     registers.fakeValues({
                         1: 0x8,
@@ -344,6 +390,34 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
             });
         };
         return memory;
+    }
+    function createTimersSpy() {
+        var timers = jasmine.createSpyObj("timers", [
+            "setDelay", 
+            "getDelay", 
+            "setSound"
+        ]);
+        Object.defineProperty(timers, "delay", {
+            set: function (value) {
+                this.setDelay(value);
+            },
+            get: function () {
+                return this.getDelay();
+            }
+        });
+        Object.defineProperty(timers, "sound", {
+            set: function (value) {
+                this.setSound(value);
+            }
+        });
+        return timers;
+    }
+    function createScreenSpy() {
+        var screen = jasmine.createSpyObj("screen", [
+            "clear", 
+            "draw"
+        ]);
+        return screen;
     }
     function createRegisterSpy() {
         var registers = jasmine.createSpyObj("registers", [

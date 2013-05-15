@@ -3,12 +3,16 @@ define(["require", "exports"], function(require, exports) {
     
     
     
+    
+    
     (function (chip8) {
         var Core = (function () {
-            function Core(registers, stack, memory) {
+            function Core(registers, stack, memory, timers, screen) {
                 this.registers = registers;
                 this.stack = stack;
                 this.memory = memory;
+                this.timers = timers;
+                this.screen = screen;
                 this.instructions = [];
                 this.instructions8 = [];
                 this.instructionsF = [];
@@ -16,6 +20,9 @@ define(["require", "exports"], function(require, exports) {
             }
             Core.prototype.execute = function (instruction) {
                 this.instructions[instruction.nibbles[0]].call(this, instruction);
+            };
+            Core.prototype.iClearScreen = function (instruction) {
+                this.screen.clear();
             };
             Core.prototype.iRet = function (instruction) {
                 this.registers.PC = this.stack.pop();
@@ -148,8 +155,37 @@ define(["require", "exports"], function(require, exports) {
             Core.prototype.iLoadFontAddress = function (instruction) {
                 this.registers.I = this.registers.read(instruction.nibbles[1]) * 5;
             };
+            Core.prototype.iSetXToDelay = function (instruction) {
+                this.registers.write(instruction.nibbles[1], this.timers.delay);
+            };
+            Core.prototype.iSetDelayToX = function (instruction) {
+                this.timers.delay = this.registers.read(instruction.nibbles[1]);
+            };
+            Core.prototype.iSetSoundToX = function (instruction) {
+                this.timers.sound = this.registers.read(instruction.nibbles[1]);
+            };
+            Core.prototype.branch0 = function (instruction) {
+                switch(instruction.NN) {
+                    case 0xE0:
+                        this.iClearScreen(instruction);
+                        break;
+                    case 0xEE:
+                        this.iRet(instruction);
+                        break;
+                    default:
+                        console.log("Error");
+                }
+            };
+            Core.prototype.iDrawSprite = function (instruction) {
+                var sprite = [];
+                var addr = this.registers.I;
+                for(var i = 0; i < instruction.nibbles[3]; i++) {
+                    sprite.push(this.memory.read(addr + i));
+                }
+                this.screen.draw(this.registers.read(instruction.nibbles[1]), this.registers.read(instruction.nibbles[2]), sprite);
+            };
             Core.prototype.mapInstructions = function () {
-                this.instructions[0x0] = this.iRet;
+                this.instructions[0x0] = this.branch0;
                 this.instructions[0x1] = this.iJmp;
                 this.instructions[0x2] = this.iCall;
                 this.instructions[0x3] = this.iSkipEqual;
@@ -171,7 +207,11 @@ define(["require", "exports"], function(require, exports) {
                 this.instructions[0xA] = this.iSetI;
                 this.instructions[0xB] = this.iJmpWithAdd;
                 this.instructions[0xC] = this.iRandInX;
+                this.instructions[0xD] = this.iDrawSprite;
                 this.instructions[0xF] = this.branchF;
+                this.instructionsF[0x07] = this.iSetXToDelay;
+                this.instructionsF[0x15] = this.iSetDelayToX;
+                this.instructionsF[0x18] = this.iSetSoundToX;
                 this.instructionsF[0x1E] = this.iAddXtoI;
                 this.instructionsF[0x29] = this.iLoadFontAddress;
                 this.instructionsF[0x33] = this.iBCD;
