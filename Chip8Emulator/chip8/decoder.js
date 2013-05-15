@@ -16,9 +16,9 @@ define(["require", "exports"], function(require, exports) {
                 var opcode = (data[0] << 8) | data[1];
                 var nibbles = [
                     data[0] >> 4, 
-                    data[0] & 15, 
+                    data[0] & 0xF, 
                     data[1] >> 4, 
-                    data[1] & 15
+                    data[1] & 0xF
                 ];
                 this.registers.PC = nextAddress + 2;
                 return {
@@ -26,7 +26,7 @@ define(["require", "exports"], function(require, exports) {
                     nibbles: nibbles,
                     bytes: data,
                     NN: data[1],
-                    NNN: opcode & 4095
+                    NNN: opcode & 0xFFF
                 };
             };
             return Decoder;

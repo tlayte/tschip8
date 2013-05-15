@@ -14,7 +14,7 @@ define(["require", "exports", "chip8/memory"], function(require, exports, __memM
             }
             Registers.prototype.reset = function () {
                 _super.prototype.reset.call(this);
-                this._PC = 512;
+                this._PC = 0x200;
                 this._I = 0;
             };
             Registers.prototype.read = function (address) {

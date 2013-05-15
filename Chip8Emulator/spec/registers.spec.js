@@ -20,7 +20,7 @@ define(["require", "exports", "chip8/registers"], function(require, exports, __r
                         }
                     });
                     it('should set PC to 0x200', function () {
-                        expect(registers.PC).toBe(512);
+                        expect(registers.PC).toBe(0x200);
                     });
                     it('should set I to 0x0', function () {
                         expect(registers.I).toBe(0);
@@ -51,7 +51,7 @@ define(["require", "exports", "chip8/registers"], function(require, exports, __r
                     });
                     it('should be writable via the aliases', function () {
                         registers.vA = 1337;
-                        expect(registers.read(10)).toBe(1337);
+                        expect(registers.read(0xA)).toBe(1337);
                     });
                     it('should raise an event when writing via an alias', function () {
                         var callback = jasmine.createSpy("callback");

@@ -67,26 +67,39 @@
       <DependentUpon>registers.ts</DependentUpon>
     </Content>
     <TypeScriptCompile Include="chip8\stack.ts" />
+    <TypeScriptCompile Include="chip8\screen.ts" />
+    <Content Include="chip8\screen.js">
+      <DependentUpon>screen.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\screen.min.js">
+      <DependentUpon>screen.ts</DependentUpon>
+    </Content>
     <Content Include="chip8\stack.js">
       <DependentUpon>stack.ts</DependentUpon>
     </Content>
     <Content Include="chip8\stack.min.js">
       <DependentUpon>stack.ts</DependentUpon>
     </Content>
-    <Content Include="Content\jasmine\jasmine.css" />
-    <Content Include="Content\jasmine\jasmine_favicon.png" />
+    <TypeScriptCompile Include="chip8\timers.ts" />
+    <Content Include="chip8\timers.js">
+      <DependentUpon>timers.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\timers.min.js">
+      <DependentUpon>timers.ts</DependentUpon>
+    </Content>
+    <Content Include="css\jasmine.css" />
+    <Content Include="css\jasmine_favicon.png" />
     <Content Include="packages.config" />
-    <Content Include="Scripts\jasmine\jasmine-html.js" />
-    <Content Include="Scripts\jasmine\jasmine.js" />
-    <Content Include="Scripts\knockout-2.2.1.debug.js" />
-    <Content Include="Scripts\knockout-2.2.1.js" />
+    <Content Include="lib\jasmine-html.js" />
+    <Content Include="lib\jasmine.js" />
+    <Content Include="lib\knockout-2.2.1.debug.js" />
+    <Content Include="lib\knockout-2.2.1.js" />
     <Content Include="chip8\cpu.js.map">
       <DependentUpon>cpu.ts</DependentUpon>
     </Content>
     <Content Include="chip8\memory.js.map">
       <DependentUpon>memory.ts</DependentUpon>
     </Content>
-    <Content Include="Scripts\jasmine\MIT.LICENSE" />
     <Content Include="chip8\event.js.map">
       <DependentUpon>event.ts</DependentUpon>
     </Content>
@@ -102,12 +115,18 @@
     <Content Include="chip8\core.js.map">
       <DependentUpon>core.ts</DependentUpon>
     </Content>
-    <None Include="Scripts\jquery-2.0.0.intellisense.js" />
-    <Content Include="Scripts\jquery-2.0.0.js" />
-    <Content Include="Scripts\jquery-2.0.0.min.js" />
-    <Content Include="Scripts\jquery-2.0.0.min.map" />
-    <Content Include="Scripts\r.js" />
-    <Content Include="Scripts\require.js" />
+    <Content Include="chip8\timers.js.map">
+      <DependentUpon>timers.ts</DependentUpon>
+    </Content>
+    <Content Include="chip8\screen.js.map">
+      <DependentUpon>screen.ts</DependentUpon>
+    </Content>
+    <None Include="lib\jquery-2.0.0.intellisense.js" />
+    <Content Include="lib\jquery-2.0.0.js" />
+    <Content Include="lib\jquery-2.0.0.min.js" />
+    <Content Include="lib\jquery-2.0.0.min.map" />
+    <Content Include="lib\r.js" />
+    <Content Include="lib\require.js" />
     <TypeScriptCompile Include="spec\memory.spec.ts" />
     <TypeScriptCompile Include="SpecRunner.ts" />
     <Content Include="SpecRunner.html" />

@@ -32,7 +32,7 @@ define(["require", "exports", "old/Events"], function(require, exports, __ev__) 
             zeroArray(this.stack, 16);
             fillArray(this.keys, 16, false);
             this.I = 0;
-            this.PC = 512;
+            this.PC = 0x200;
             this.SP = 0;
             this.delay = 0;
             this.sound = 0;
@@ -42,7 +42,7 @@ define(["require", "exports", "old/Events"], function(require, exports, __ev__) 
         Cpu.prototype.cycle = function () {
             var opcode = this.readOpcode();
             var MSN = getNibble1(opcode);
-            this.instructions[MSN](opcode & 4095);
+            this.instructions[MSN](opcode & 0xFFF);
             this.updateDebug();
         };
         Cpu.prototype.tick = function () {
@@ -59,10 +59,10 @@ define(["require", "exports", "old/Events"], function(require, exports, __ev__) 
             var _this = this;
             this.instructions[0] = function (data) {
                 switch(data) {
-                    case 224:
+                    case 0x0e0:
                         _this.ClearScreen.raise();
                         break;
-                    case 238:
+                    case 0x0ee:
                         _this.PC = _this.pop();
                         break;
                     default:
@@ -79,13 +79,13 @@ define(["require", "exports", "old/Events"], function(require, exports, __ev__) 
             };
             this.instructions[3] = function (data) {
                 var register = _this.registers[getNibble2(data)];
-                if(register === (data & 255)) {
+                if(register === (data & 0xFF)) {
                     _this.moveNext();
                 }
             };
             this.instructions[4] = function (data) {
                 var register = _this.registers[getNibble2(data)];
-                if(register !== (data & 255)) {
+                if(register !== (data & 0xFF)) {
                     _this.moveNext();
                 }
             };
@@ -98,59 +98,59 @@ define(["require", "exports", "old/Events"], function(require, exports, __ev__) 
             };
             this.instructions[6] = function (data) {
                 var register = getNibble2(data);
-                _this.registers[register] = (data & 255);
+                _this.registers[register] = (data & 0xFF);
             };
             this.instructions[7] = function (data) {
                 var register = getNibble2(data);
-                _this.registers[register] += (data & 255);
+                _this.registers[register] += (data & 0xFF);
             };
             this.instructions[8] = function (data) {
                 var nibbles = toNibbles(data);
                 _this.instructions8[nibbles[3]](nibbles[1], nibbles[2]);
             };
-            this.instructions8[0] = function (x, y) {
+            this.instructions8[0x0] = function (x, y) {
                 _this.registers[x] = _this.registers[y];
             };
-            this.instructions8[1] = function (x, y) {
+            this.instructions8[0x1] = function (x, y) {
                 _this.registers[x] |= _this.registers[y];
             };
-            this.instructions8[2] = function (x, y) {
+            this.instructions8[0x2] = function (x, y) {
                 _this.registers[x] &= _this.registers[y];
             };
-            this.instructions8[3] = function (x, y) {
+            this.instructions8[0x3] = function (x, y) {
                 _this.registers[x] ^= _this.registers[y];
             };
-            this.instructions8[4] = function (x, y) {
+            this.instructions8[0x4] = function (x, y) {
                 var result = _this.registers[x] + _this.registers[y];
-                _this.registers[15] = result & 65536;
-                _this.registers[x] = result & 65535;
+                _this.registers[0xf] = result & 0x10000;
+                _this.registers[x] = result & 0xFFFF;
             };
-            this.instructions8[5] = function (x, y) {
+            this.instructions8[0x5] = function (x, y) {
                 var result = _this.registers[x] - _this.registers[y];
                 if(result < 0) {
-                    result += 65536;
-                    _this.registers[15] = 1;
+                    result += 0x10000;
+                    _this.registers[0xf] = 1;
                 } else {
-                    _this.registers[15] = 0;
+                    _this.registers[0xf] = 0;
                 }
                 _this.registers[x] = result;
             };
-            this.instructions8[6] = function (x, y) {
-                _this.registers[15] = _this.registers[x] & 1;
+            this.instructions8[0x6] = function (x, y) {
+                _this.registers[0xf] = _this.registers[x] & 0x1;
                 _this.registers[x] >>= 1;
             };
-            this.instructions8[7] = function (x, y) {
+            this.instructions8[0x7] = function (x, y) {
                 var result = _this.registers[y] - _this.registers[x];
                 if(result < 0) {
-                    result += 65536;
-                    _this.registers[15] = 1;
+                    result += 0x10000;
+                    _this.registers[0xf] = 1;
                 } else {
-                    _this.registers[15] = 0;
+                    _this.registers[0xf] = 0;
                 }
                 _this.registers[x] = result;
             };
-            this.instructions8[14] = function (x, y) {
-                _this.registers[15] = (_this.registers[x] >> 15) & 1;
+            this.instructions8[0xE] = function (x, y) {
+                _this.registers[0xf] = (_this.registers[x] >> 0xf) & 0x1;
                 _this.registers[x] <<= 1;
             };
             this.instructions[9] = function (data) {
@@ -158,70 +158,70 @@ define(["require", "exports", "old/Events"], function(require, exports, __ev__) 
                     _this.moveNext();
                 }
             };
-            this.instructions[10] = function (data) {
-                _this.I = data & 4095;
+            this.instructions[0xA] = function (data) {
+                _this.I = data & 0xFFF;
             };
-            this.instructions[11] = function (data) {
-                _this.PC = _this.registers[0] + (data & 4095);
+            this.instructions[0xB] = function (data) {
+                _this.PC = _this.registers[0] + (data & 0xFFF);
             };
-            this.instructions[12] = function (data) {
-                var random = Math.random() * 65535;
-                _this.registers[getNibble2(data)] = random & 255;
+            this.instructions[0xC] = function (data) {
+                var random = Math.random() * 0xFFFF;
+                _this.registers[getNibble2(data)] = random & 0xFF;
             };
-            this.instructions[13] = function (data) {
+            this.instructions[0xD] = function (data) {
                 var nibbles = toNibbles(data);
                 var x = _this.registers[nibbles[1]];
                 var y = _this.registers[nibbles[2]];
                 var height = nibbles[3];
             };
-            this.instructions[14] = function (data) {
+            this.instructions[0xE] = function (data) {
                 var x = getNibble2(data);
-                switch(data & 255) {
-                    case 158:
+                switch(data & 0xff) {
+                    case 0x9e:
                         if(_this.keys[x]) {
                             _this.moveNext();
                         }
                         break;
-                    case 161:
+                    case 0xa1:
                         if(!_this.keys[x]) {
                             _this.moveNext();
                         }
                         break;
                 }
             };
-            this.instructions[15] = function (data) {
-                var subcode = data & 255;
+            this.instructions[0xF] = function (data) {
+                var subcode = data & 0xff;
                 _this.instructionsF[subcode](getNibble2(data));
             };
-            this.instructionsF[7] = function (x) {
+            this.instructionsF[0x07] = function (x) {
                 _this.registers[x] = _this.delay;
             };
-            this.instructionsF[10] = function (x) {
+            this.instructionsF[0x0A] = function (x) {
                 throw "FX07 not implemented";
             };
-            this.instructionsF[21] = function (x) {
+            this.instructionsF[0x15] = function (x) {
                 _this.delay = _this.registers[x];
             };
-            this.instructionsF[24] = function (x) {
+            this.instructionsF[0x18] = function (x) {
                 _this.sound = _this.registers[x];
                 if(_this.sound > 0) {
                     _this.startSound.raise();
                 }
             };
-            this.instructionsF[30] = function (x) {
+            this.instructionsF[0x1e] = function (x) {
                 _this.I += _this.registers[x];
             };
-            this.instructionsF[41] = function (x) {
+            this.instructionsF[0x29] = function (x) {
             };
-            this.instructionsF[51] = function (x) {
+            this.instructionsF[0x33] = function (x) {
             };
-            this.instructionsF[85] = function (x) {
+            this.instructionsF[0x55] = function (x) {
                 var end = _this.I + x;
                 for(var y = 0; _this.I <= end; y++ , _this.I++) {
                     _this.write(_this.I, _this.registers[y]);
                 }
             };
-            this.instructionsF[101] = function (x) {
+            this.instructionsF[0x65] = function (x) {
                 var end = _this.I + x;
                 for(var y = 0; _this.I <= end; y++ , _this.I++) {
                     _this.registers[y] = _this.read(_this.I);
@@ -280,26 +280,26 @@ define(["require", "exports", "old/Events"], function(require, exports, __ev__) 
     }
     exports.displayByte = displayByte;
     function getNibble1(opcode) {
-        return (opcode & 61440) >> 12;
+        return (opcode & 0xf000) >> 12;
     }
     function getNibble2(opcode) {
-        return (opcode & 3840) >> 8;
+        return (opcode & 0x0f00) >> 8;
     }
     function getNibble3(opcode) {
-        return (opcode & 240) >> 4;
+        return (opcode & 0x00f0) >> 4;
     }
     function getNibble4(opcode) {
-        return (opcode & 15);
+        return (opcode & 0x000f);
     }
     function toNibbles(opcode) {
         var nibbles = [];
-        nibbles[3] = opcode & 15;
+        nibbles[3] = opcode & 0xf;
         opcode >>= 4;
-        nibbles[2] = opcode & 15;
+        nibbles[2] = opcode & 0xf;
         opcode >>= 4;
-        nibbles[1] = opcode & 15;
+        nibbles[1] = opcode & 0xf;
         opcode >>= 4;
-        nibbles[0] = opcode & 15;
+        nibbles[0] = opcode & 0xf;
         return nibbles;
     }
     function fillArray(array, size, value) {
