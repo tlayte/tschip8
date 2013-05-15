@@ -8,12 +8,14 @@ export module chip8.spec {
     describe("A chip-8 core", () => {
         var core: Chip8.Core;
         var registers;
+        var memory;
         var stack;
 
         beforeEach(() => {
             registers = createRegisterSpy();
             stack = createStackSpy();
-            core = new Chip8.Core(registers, stack);
+            memory = createMemorySpy();
+            core = new Chip8.Core(registers, stack, memory);
         });
 
         //it('should execute the XXXX instruction', () => {
@@ -152,6 +154,164 @@ export module chip8.spec {
             expect(registers.write).toHaveBeenCalledWith(1, 0xF0);
         });
 
+        it('should execute the 8XY6 - shift X right by 1 with carry instruction', () => {
+            registers.fakeValues({ 1: 0x04, 2: 0x05 });
+            core.execute(createInstruction(0x81, 0x06));
+            expect(registers.write).toHaveBeenCalledWith(0xf, 0);
+            expect(registers.write).toHaveBeenCalledWith(1, 0x02);
+
+            registers.write.reset();
+
+            core.execute(createInstruction(0x82, 0x06));
+            expect(registers.write).toHaveBeenCalledWith(0xf, 1);
+            expect(registers.write).toHaveBeenCalledWith(2, 0x02);
+        });
+
+        it('should execute the 8XY7 - sub X from Y storing in X with borrow instruction', () => {
+            registers.fakeValues({ 1: 0x10, 2: 0x05, 3: 0x20 });
+            core.execute(createInstruction(0x82, 0x17));
+            expect(registers.write).toHaveBeenCalledWith(0xf, 1);
+            expect(registers.write).toHaveBeenCalledWith(2, 0x0B);
+
+            registers.write.reset();
+
+            core.execute(createInstruction(0x83, 0x17));
+            expect(registers.write).toHaveBeenCalledWith(0xf, 0);
+            expect(registers.write).toHaveBeenCalledWith(3, 0xF0);
+        });
+
+        it('should execute the 8XYE - shift X left by 1 with carry instruction', () => {
+            registers.fakeValues({ 1: 0xF0, 2: 0x04 });
+            core.execute(createInstruction(0x81, 0x0E));
+            expect(registers.write).toHaveBeenCalledWith(0xf, 1);
+            expect(registers.write).toHaveBeenCalledWith(1, 0xE0);
+
+            registers.write.reset();
+
+            core.execute(createInstruction(0x82, 0x0E));
+            expect(registers.write).toHaveBeenCalledWith(0xf, 0);
+            expect(registers.write).toHaveBeenCalledWith(2, 0x08);
+        });
+
+        it('should execute the 9XY0 - skip if X equal Y instruction', () => {
+            registers.fakeValues({
+                1: 0x2f,
+                2: 0x2f,
+                3: 0x71,
+                "PC": 0x200
+            });
+            core.execute(createInstruction(0x91, 0x20));
+            expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
+
+            registers.write.reset();
+
+            core.execute(createInstruction(0x91, 0x30));
+            expect(registers.write).not.toHaveBeenCalledWith("PC", 0x202);
+        });
+
+        it('should execute the ANNN - set I to NNN instruction', () => {
+            var instruction = createInstruction(0xA1, 0xFD);
+            core.execute(instruction);
+            expect(registers.write).toHaveBeenCalledWith("I", 0x1FD);
+        });
+
+        it('should execute the BNNN - jump to NNN + v0 instruction', () => {
+            registers.fakeValues({ 0: 0xff });
+            var instruction = createInstruction(0xBF, 0xFF);
+            core.execute(instruction);
+            expect(registers.write).toHaveBeenCalledWith("PC", 0x10FE);
+        });
+
+        it('should execute the CXNN - set X to random AND NN instruction', () => {
+            var oldRand = Math.random;
+            Math.random = jasmine.createSpy("random").andReturn((1 / 0xff) * 0xf9);
+
+            core.execute(createInstruction(0xC1, 0xFF));
+            expect(registers.write).toHaveBeenCalledWith(1, 0xf9);
+
+            registers.write.reset();
+
+            core.execute(createInstruction(0xC1, 0x0F));
+            expect(registers.write).toHaveBeenCalledWith(1, 0x09);
+
+            Math.random = oldRand;
+        });
+
+        it('should execute the FX1E - Add vX to I instruction', () => {
+            registers.fakeValues({ 1: 0x8, 2: 0xff, I: 0xF01 });
+
+            core.execute(createInstruction(0xF1, 0x1E));
+            expect(registers.write).toHaveBeenCalledWith("I", 0xF09);
+            expect(registers.write).toHaveBeenCalledWith(0xF, 0);
+
+            registers.write.reset();
+
+            core.execute(createInstruction(0xF2, 0x1E));
+            expect(registers.write).toHaveBeenCalledWith("I", 0x0);
+            expect(registers.write).toHaveBeenCalledWith(0xF, 1);
+        });
+
+        it('should execute the FX29 - load address of font char X into I instruction', () => {
+            registers.fakeValues({ 1: 0x03, 2: 0x01 });
+            core.execute(createInstruction(0xF1, 0x29));
+            expect(registers.write).toHaveBeenCalledWith("I", 15);
+
+            registers.write.reset();
+
+            core.execute(createInstruction(0xF2, 0x29));
+            expect(registers.write).toHaveBeenCalledWith("I", 5);
+        });
+
+        it('should execute the FX33 - store BCD of X in memory at I instruction', () => {
+            registers.fakeValues({ 1: 0xF0, 2: 0x02, I: 0x700 });
+            core.execute(createInstruction(0xF1, 0x33));
+            expect(memory.write).toHaveBeenCalledWith(0x700, 2);
+            expect(memory.write).toHaveBeenCalledWith(0x701, 4);
+            expect(memory.write).toHaveBeenCalledWith(0x702, 0);
+
+            memory.write.reset();
+
+            core.execute(createInstruction(0xF2, 0x33));
+            expect(memory.write).toHaveBeenCalledWith(0x700, 0);
+            expect(memory.write).toHaveBeenCalledWith(0x701, 0);
+            expect(memory.write).toHaveBeenCalledWith(0x702, 2);
+        });
+
+        it('should execute the FX55 - store v0 to v5 in memory at I instruction', () => {
+            registers.fakeValues({
+                0: 0,
+                1: 10,
+                2: 20,
+                3: 30,
+                4: 40,
+                "I": 0x700
+            });
+            core.execute(createInstruction(0xF4, 0x55));
+            expect(registers.write).toHaveBeenCalledWith("I", 0x705);
+            expect(memory.write).toHaveBeenCalledWith(0x700, 0);
+            expect(memory.write).toHaveBeenCalledWith(0x701, 10);
+            expect(memory.write).toHaveBeenCalledWith(0x702, 20);
+            expect(memory.write).toHaveBeenCalledWith(0x703, 30);
+            expect(memory.write).toHaveBeenCalledWith(0x704, 40);
+        });
+
+        it('should execute the FX65 - load v0 to v5 from memory at I instruction', () => {
+            memory.fakeValues({
+                0x700: 0,
+                0x701: 10,
+                0x702: 20,
+                0x703: 30,
+                0x704: 40                
+            });
+            registers.fakeValues({ "I": 0x700 });
+            core.execute(createInstruction(0xF4, 0x65));
+            expect(registers.write).toHaveBeenCalledWith("I", 0x705);
+            expect(registers.write).toHaveBeenCalledWith(0, 0);
+            expect(registers.write).toHaveBeenCalledWith(1, 10);
+            expect(registers.write).toHaveBeenCalledWith(2, 20);
+            expect(registers.write).toHaveBeenCalledWith(3, 30);
+            expect(registers.write).toHaveBeenCalledWith(4, 40);
+        });
     });
 }
 
@@ -173,6 +333,16 @@ function createStackSpy() {
     return stack;
 }
 
+function createMemorySpy() {
+    var memory = jasmine.createSpyObj("memory", ["read", "write"]);
+    memory.fakeValues = (values) => {
+        memory.read.andCallFake((address) => {
+            return values[address];
+        });
+    };
+    return memory;
+}
+
 function createRegisterSpy() {
     var registers = jasmine.createSpyObj("registers", ["read", "write"]);
     Object.defineProperty(registers, "PC", {
@@ -180,8 +350,8 @@ function createRegisterSpy() {
         get: function () { return this.read("PC"); }
     });
     Object.defineProperty(registers, "I", {
-        set: function (value) { this.write("PC", value); },
-        get: function () { return this.read("PC"); }
+        set: function (value) { this.write("I", value); },
+        get: function () { return this.read("I"); }
     });
 
     for (var i = 0; i <= 0xf; i++){
