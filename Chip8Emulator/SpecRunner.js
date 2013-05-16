@@ -4,7 +4,8 @@ require([
     'spec/stack.spec', 
     'spec/decoder.spec', 
     'spec/core.spec', 
-    'spec/timers.spec'
+    'spec/timers.spec', 
+    'spec/screen.spec'
 ], function () {
     var jasmineEnv = jasmine.getEnv();
     jasmineEnv.execute();

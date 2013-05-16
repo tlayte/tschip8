@@ -53,6 +53,42 @@
             font-size: 0.6em;
             font-family: Consolas;
         }
+
+        .keypad {
+            width: 8em;
+            height: 8em;
+            padding: 1em;
+            background: #ccc;
+            border-radius: 0.5em;
+            border: 0.05em solid #aaa;
+            font-size: 1em;
+            transition: 0.3s linear all;
+        }
+
+        .icon-sized {
+            font-size: 0.45em;
+        }
+
+        .keypad-button {
+            font-size: 1em;
+            background: #ddd;
+            border: 0.1em solid #bbb;
+            display: block;
+            float: left;
+            margin: 0;
+            width: 2em;
+            height: 2em;
+            border-radius: 0.3em;
+            cursor: pointer;
+        }
+
+        .keypad-button:hover {
+            background: #ffe;
+        }
+
+        .keypad-button:active {
+            background: #bbb;
+        }
     </style>
 </head>
     <body>
@@ -160,6 +196,27 @@
                 <li class="code-line-3"></li>
                 <li class="code-line-4"></li>
             </ul>
+        </div>
+        <div class="keypad icon-sized">
+            <button class="keypad-button" data-key="1">1</button>
+            <button class="keypad-button" data-key="2">2</button>
+            <button class="keypad-button" data-key="3">3</button>
+            <button class="keypad-button" data-key="12">C</button>
+            
+            <button class="keypad-button" data-key="4">4</button>
+            <button class="keypad-button" data-key="5">5</button>
+            <button class="keypad-button" data-key="6">6</button>
+            <button class="keypad-button" data-key="13">D</button>
+
+            <button class="keypad-button" data-key="7">7</button>
+            <button class="keypad-button" data-key="8">8</button>
+            <button class="keypad-button" data-key="9">9</button>
+            <button class="keypad-button" data-key="14">E</button>
+
+            <button class="keypad-button" data-key="10">A</button>
+            <button class="keypad-button" data-key="0">0</button>
+            <button class="keypad-button" data-key="11">B</button>
+            <button class="keypad-button" data-key="15">F</button>
         </div>
     </body>
 </html>

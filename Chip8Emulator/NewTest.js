@@ -106,6 +106,29 @@ define(["require", "exports", "chip8/decoder", "chip8/registers", "chip8/stack",
                 clock = null;
             }
         });
+        $(".keypad").click(function () {
+            $(this).toggleClass("icon-sized");
+            console.dir(this);
+        });
+        $(".keypad-button").click(function (event) {
+            event.stopPropagation();
+        });
+        $(".keypad-button").mousedown(function () {
+            $(this).data("isPressed", true);
+            console.log("Key " + parseInt($(this).data("key"), 10).toString(16) + " pressed");
+        });
+        $(".keypad-button").mouseup(function () {
+            if($(this).data("isPressed")) {
+                $(this).data("isPressed", false);
+                console.log("Key " + parseInt($(this).data("key"), 10).toString(16) + " released");
+            }
+        });
+        $(".keypad-button").mouseout(function (event) {
+            if($(this).data("isPressed")) {
+                $(this).data("isPressed", false);
+                console.log("Key " + parseInt($(this).data("key"), 10).toString(16) + " released");
+            }
+        });
     });
     function displayAssembly() {
         for(var i = 0; i < 5; i++) {
