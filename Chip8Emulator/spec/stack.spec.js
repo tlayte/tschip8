@@ -15,11 +15,14 @@ define(["require", "exports", "chip8/stack"], function(require, exports, __stack
                 });
                 it('should reset SP to zero', function () {
                     var stack = new Chip8.Stack(10);
+                    var callback = jasmine.createSpy("callback");
+                    stack.onWrite.subscribe(callback);
                     stack.push(1);
                     stack.push(2);
                     stack.push(3);
                     stack.reset();
                     expect(stack.SP).toBe(0);
+                    expect(callback).toHaveBeenCalledWith(0, null);
                 });
                 describe('when pushing values', function () {
                     var stack;
@@ -39,6 +42,12 @@ define(["require", "exports", "chip8/stack"], function(require, exports, __stack
                         expect(function () {
                             stack.push(1);
                         }).toThrow("Stack overflow");
+                    });
+                    it('should raise an event', function () {
+                        var callback = jasmine.createSpy("callback");
+                        stack.onWrite.subscribe(callback);
+                        stack.push(5);
+                        expect(callback).toHaveBeenCalledWith(1, 5);
                     });
                 });
                 describe('when popping values', function () {
@@ -67,6 +76,12 @@ define(["require", "exports", "chip8/stack"], function(require, exports, __stack
                         expect(function () {
                             stack.pop();
                         }).toThrow("Stack underflow");
+                    });
+                    it('should raise an event', function () {
+                        var callback = jasmine.createSpy("callback");
+                        stack.onWrite.subscribe(callback);
+                        stack.pop();
+                        expect(callback).toHaveBeenCalledWith(4, 5);
                     });
                 });
             });

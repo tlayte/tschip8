@@ -149,7 +149,7 @@ export module chip8 {
                 case 0xEE:
                     return this.iRet(instruction);
                 default:
-                    return "SYS " + hexPad(instruction.NNN, 3);
+                    return instruction.NNN === 0 ? "-------" : "SYS " + hexPad(instruction.NNN, 3);
             }
         }
 

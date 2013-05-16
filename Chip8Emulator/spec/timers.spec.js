@@ -58,6 +58,18 @@ define(["require", "exports", "chip8/timers"], function(require, exports, __time
                     timers.sound = 0;
                     expect(callback).not.toHaveBeenCalled();
                 });
+                it('should be able to reset both timers', function () {
+                    var writeCallback = jasmine.createSpy("writeCallback");
+                    var eventCallback = jasmine.createSpy("eventCallback");
+                    timers.sound = 10;
+                    timers.delay = 129;
+                    timers.onStopSound.subscribe(eventCallback);
+                    timers.onWrite.subscribe(writeCallback);
+                    timers.reset();
+                    expect(eventCallback).toHaveBeenCalled();
+                    expect(writeCallback).toHaveBeenCalledWith("delay", 0);
+                    expect(writeCallback).toHaveBeenCalledWith("sound", 0);
+                });
             });
         })(chip8.spec || (chip8.spec = {}));
         var spec = chip8.spec;

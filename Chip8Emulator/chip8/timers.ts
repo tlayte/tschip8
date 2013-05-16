@@ -18,6 +18,11 @@ export module chip8{
             }
         }
 
+        reset() {
+            this.delay = 0;
+            this.sound = 0;
+        }
+
         get delay(): number {
             return this._delay;
         }

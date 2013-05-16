@@ -1,4 +1,4 @@
-define(["require", "exports", "chip8/decoder", "chip8/registers", "chip8/stack", "chip8/memory", "chip8/timers", "chip8/screen", "chip8/core", "chip8/assembler", "lib/jquery-2.0.0"], function(require, exports, __decoderModule__, __registerModule__, __stackModule__, __memoryModule__, __timersModule__, __screenModule__, __coreModule__, __assemblerModule__) {
+define(["require", "exports", "chip8/decoder", "chip8/registers", "chip8/stack", "chip8/memory", "chip8/timers", "chip8/screen", "chip8/keypad", "chip8/core", "chip8/assembler", "lib/jquery-2.0.0"], function(require, exports, __decoderModule__, __registerModule__, __stackModule__, __memoryModule__, __timersModule__, __screenModule__, __keypadModule__, __coreModule__, __assemblerModule__) {
     var decoderModule = __decoderModule__;
 
     var registerModule = __registerModule__;
@@ -11,6 +11,8 @@ define(["require", "exports", "chip8/decoder", "chip8/registers", "chip8/stack",
 
     var screenModule = __screenModule__;
 
+    var keypadModule = __keypadModule__;
+
     var coreModule = __coreModule__;
 
     var assemblerModule = __assemblerModule__;
@@ -21,14 +23,98 @@ define(["require", "exports", "chip8/decoder", "chip8/registers", "chip8/stack",
     var stack = new stackModule.chip8.Stack();
     var timers = new timersModule.chip8.Timers();
     var screen = new screenModule.chip8.Screen();
-    var core = new coreModule.chip8.Core(registers, stack, memory, timers, screen);
+    var keypad = new keypadModule.chip8.Keypad();
+    var core = new coreModule.chip8.Core(registers, stack, memory, timers, screen, keypad);
     var disassembler = new assemblerModule.chip8.Disassembler();
-    var sound = document.createElement("audio");
-    sound.loop = true;
-    sound.autoplay = false;
-    sound.preload = "auto";
-    sound.src = "beep.mp3";
     $(document).ready(function () {
+        var sound = document.createElement("audio");
+        sound.loop = true;
+        sound.autoplay = false;
+        sound.preload = "auto";
+        sound.src = "beep.mp3";
+        loadCode();
+        registers.onWrite.subscribe(function (register, value) {
+            $(".variable-" + register + " .variable-value").text(value.toString(16).toUpperCase());
+            if(register === "PC") {
+                displayAssembly();
+            }
+        });
+        timers.onWrite.subscribe(function (timer, value) {
+            $(".variable-" + timer + " .variable-value").text(hexPad(value, 2));
+        });
+        timers.onStartSound.subscribe(function () {
+            $(".sound").addClass("current");
+            sound.currentTime = 1;
+            sound.play();
+        });
+        timers.onStopSound.subscribe(function () {
+            $(".sound").removeClass("current");
+            sound.pause();
+        });
+        stack.onWrite.subscribe(function (SP, value) {
+            $(".variable-SP .variable-value").text(hexPad(SP, 1));
+        });
+        registers.reset();
+        function tick() {
+            timers.tick();
+            if(!core.halted) {
+                var instruction = decoder.getNext();
+                core.execute(instruction);
+            }
+        }
+        $(".cycle").click(function () {
+            tick();
+        });
+        var clock = null;
+        $(".start").click(function () {
+            if(clock == null) {
+                clock = setInterval(function () {
+                    tick();
+                }, 16);
+            } else {
+                clearInterval(clock);
+                clock = null;
+            }
+        });
+        $(".keypad").click(function () {
+            $(".keypad-container").toggleClass("icon-sized");
+            console.dir(this);
+        });
+        $(".keypad-button").click(function (event) {
+            event.stopPropagation();
+        });
+        $(".keypad-button").mousedown(function () {
+            $(this).data("isPressed", true);
+            console.log("Key " + parseInt($(this).data("key"), 10).toString(16) + " pressed");
+        });
+        $(".keypad-button").mouseup(function () {
+            if($(this).data("isPressed")) {
+                $(this).data("isPressed", false);
+                console.log("Key " + parseInt($(this).data("key"), 10).toString(16) + " released");
+            }
+        });
+        $(".keypad-button").mouseout(function (event) {
+            if($(this).data("isPressed")) {
+                $(this).data("isPressed", false);
+                console.log("Key " + parseInt($(this).data("key"), 10).toString(16) + " released");
+            }
+        });
+        $(".keypad-controls-grabber").click(function () {
+            $(".keypad-controls-container").toggleClass("slide-out");
+        });
+        $(".reset").click(function () {
+            if(clock) {
+                clearInterval(clock);
+                clock = null;
+            }
+            memory.reset();
+            loadCode();
+            stack.reset();
+            timers.reset();
+            registers.reset();
+        });
+    });
+    function loadCode() {
         memory.write(0x200, 0x60);
         memory.write(0x201, 0x12);
         memory.write(0x202, 0x60);
@@ -69,73 +155,13 @@ define(["require", "exports", "chip8/decoder", "chip8/registers", "chip8/stack",
             0x17, 
             0x04
         ], -1);
-        registers.onWrite.subscribe(function (register, value) {
-            $(".variable-" + register + " .variable-value").text(value.toString(16).toUpperCase());
-            if(register === "PC") {
-                displayAssembly();
-            }
-        });
-        timers.onWrite.subscribe(function (timer, value) {
-            $(".variable-" + timer + " .variable-value").text(hexPad(value, 2));
-        });
-        timers.onStartSound.subscribe(function () {
-            $(".sound").addClass("current");
-            sound.currentTime = 1;
-            sound.play();
-        });
-        timers.onStopSound.subscribe(function () {
-            $(".sound").removeClass("current");
-            sound.pause();
-        });
-        registers.reset();
-        $(".cycle").click(function () {
-            timers.tick();
-            var instruction = decoder.getNext();
-            core.execute(instruction);
-        });
-        var clock = null;
-        $(".start").click(function () {
-            if(clock == null) {
-                clock = setInterval(function () {
-                    timers.tick();
-                    var instruction = decoder.getNext();
-                    core.execute(instruction);
-                }, 16);
-            } else {
-                clearInterval(clock);
-                clock = null;
-            }
-        });
-        $(".keypad").click(function () {
-            $(this).toggleClass("icon-sized");
-            console.dir(this);
-        });
-        $(".keypad-button").click(function (event) {
-            event.stopPropagation();
-        });
-        $(".keypad-button").mousedown(function () {
-            $(this).data("isPressed", true);
-            console.log("Key " + parseInt($(this).data("key"), 10).toString(16) + " pressed");
-        });
-        $(".keypad-button").mouseup(function () {
-            if($(this).data("isPressed")) {
-                $(this).data("isPressed", false);
-                console.log("Key " + parseInt($(this).data("key"), 10).toString(16) + " released");
-            }
-        });
-        $(".keypad-button").mouseout(function (event) {
-            if($(this).data("isPressed")) {
-                $(this).data("isPressed", false);
-                console.log("Key " + parseInt($(this).data("key"), 10).toString(16) + " released");
-            }
-        });
-    });
+    }
     function displayAssembly() {
-        for(var i = 0; i < 5; i++) {
+        for(var i = 0; i < 7; i++) {
             var line = i - 2;
             var addr = registers.PC + (line * 2);
             if(addr < 0x200) {
-                $(".code-line-" + i).text(" --- --- --- --- ---");
+                $(".code-line-" + i).text("----- ---- ---------");
                 continue;
             }
             var instruction = decoder.peekNext(i - 2);

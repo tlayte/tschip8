@@ -18,6 +18,10 @@ define(["require", "exports", "chip8/event"], function(require, exports, __event
                     this.sound = this._sound - 1;
                 }
             };
+            Timers.prototype.reset = function () {
+                this.delay = 0;
+                this.sound = 0;
+            };
             Object.defineProperty(Timers.prototype, "delay", {
                 get: function () {
                     return this._delay;

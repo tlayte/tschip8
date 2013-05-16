@@ -4,6 +4,7 @@ import stackModule = module("chip8/stack");
 import memoryModule = module("chip8/memory");
 import timersModule = module("chip8/timers");
 import screenModule = module("chip8/screen");
+import keypadModule = module("chip8/keypad");
 
 export module chip8 {
     export class Core {
@@ -11,14 +12,26 @@ export module chip8 {
         private instructions8 = [];
         private instructionsF = [];
 
+        public halted: bool = false;
+        private keypressTarget: number;
+
         constructor(
                 public registers: registerModule.chip8.Registers,
                 public stack: stackModule.chip8.Stack,
                 public memory: memoryModule.chip8.Memory,
                 public timers: timersModule.chip8.Timers,
-                public screen: screenModule.chip8.Screen
+                public screen: screenModule.chip8.Screen,
+                public keypad: keypadModule.chip8.Keypad
                 ) {
             this.mapInstructions();
+            this.keypad.onKeyDown.subscribe(this.keyDown.bind(this));
+        }
+
+        private keyDown(key: number) {
+            if (this.halted) {
+                this.registers.write(this.keypressTarget, key);
+                this.halted = false;
+            }
         }
 
         execute(instruction: decoderModule.chip8.Instruction) {
@@ -219,7 +232,20 @@ export module chip8 {
             for (var i = 0; i < instruction.nibbles[3]; i++){
                 sprite.push(this.memory.read(addr + i));
             }
-            this.screen.draw(this.registers.read(instruction.nibbles[1]), this.registers.read(instruction.nibbles[2]), sprite);
+            var result = this.screen.draw(this.registers.read(instruction.nibbles[1]), this.registers.read(instruction.nibbles[2]), sprite);
+            this.registers.vF = result;
+        }
+
+        private iSkipOnKeyState(instruction: decoderModule.chip8.Instruction) {
+            var keyState = this.keypad.read(this.registers.read(instruction.X));
+            if (!!keyState != (instruction.NN == 0xA1)) {
+                this.registers.PC += 2;
+            }
+        }
+
+        private iAwaitKey(instruction: decoderModule.chip8.Instruction) {
+            this.halted = true;
+            this.keypressTarget = instruction.X;
         }
 
 
@@ -248,8 +274,11 @@ export module chip8 {
             this.instructions[0xC] = this.iRandInX;
             this.instructions[0xD] = this.iDrawSprite;
 
+            this.instructions[0xE] = this.iSkipOnKeyState;
+
             this.instructions[0xF] = this.branchF;
             this.instructionsF[0x07] = this.iSetXToDelay;
+            this.instructionsF[0x0A] = this.iAwaitKey;
             this.instructionsF[0x15] = this.iSetDelayToX;
             this.instructionsF[0x18] = this.iSetSoundToX;
             this.instructionsF[0x1E] = this.iAddXtoI;

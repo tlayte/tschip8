@@ -5,19 +5,29 @@ define(["require", "exports"], function(require, exports) {
     
     
     
+    
     (function (chip8) {
         var Core = (function () {
-            function Core(registers, stack, memory, timers, screen) {
+            function Core(registers, stack, memory, timers, screen, keypad) {
                 this.registers = registers;
                 this.stack = stack;
                 this.memory = memory;
                 this.timers = timers;
                 this.screen = screen;
+                this.keypad = keypad;
                 this.instructions = [];
                 this.instructions8 = [];
                 this.instructionsF = [];
+                this.halted = false;
                 this.mapInstructions();
+                this.keypad.onKeyDown.subscribe(this.keyDown.bind(this));
             }
+            Core.prototype.keyDown = function (key) {
+                if(this.halted) {
+                    this.registers.write(this.keypressTarget, key);
+                    this.halted = false;
+                }
+            };
             Core.prototype.execute = function (instruction) {
                 this.instructions[instruction.nibbles[0]].call(this, instruction);
             };
@@ -182,7 +192,18 @@ define(["require", "exports"], function(require, exports) {
                 for(var i = 0; i < instruction.nibbles[3]; i++) {
                     sprite.push(this.memory.read(addr + i));
                 }
-                this.screen.draw(this.registers.read(instruction.nibbles[1]), this.registers.read(instruction.nibbles[2]), sprite);
+                var result = this.screen.draw(this.registers.read(instruction.nibbles[1]), this.registers.read(instruction.nibbles[2]), sprite);
+                this.registers.vF = result;
+            };
+            Core.prototype.iSkipOnKeyState = function (instruction) {
+                var keyState = this.keypad.read(this.registers.read(instruction.X));
+                if(!!keyState != (instruction.NN == 0xA1)) {
+                    this.registers.PC += 2;
+                }
+            };
+            Core.prototype.iAwaitKey = function (instruction) {
+                this.halted = true;
+                this.keypressTarget = instruction.X;
             };
             Core.prototype.mapInstructions = function () {
                 this.instructions[0x0] = this.branch0;
@@ -208,8 +229,10 @@ define(["require", "exports"], function(require, exports) {
                 this.instructions[0xB] = this.iJmpWithAdd;
                 this.instructions[0xC] = this.iRandInX;
                 this.instructions[0xD] = this.iDrawSprite;
+                this.instructions[0xE] = this.iSkipOnKeyState;
                 this.instructions[0xF] = this.branchF;
                 this.instructionsF[0x07] = this.iSetXToDelay;
+                this.instructionsF[0x0A] = this.iAwaitKey;
                 this.instructionsF[0x15] = this.iSetDelayToX;
                 this.instructionsF[0x18] = this.iSetSoundToX;
                 this.instructionsF[0x1E] = this.iAddXtoI;

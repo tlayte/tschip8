@@ -47,7 +47,7 @@
         }
 
         .current {
-            color: green;
+            color: limegreen;
         }
         .code li {
             font-size: 0.6em;
@@ -59,10 +59,66 @@
             height: 8em;
             padding: 1em;
             background: #ccc;
-            border-radius: 0.5em;
+            border-radius: 0.2em;
             border: 0.05em solid #aaa;
             font-size: 1em;
+            position: relative;
+            z-index: 2;
+        }
+
+        .keypad-container {
+            font-size: 1em;
+            position: relative;
+            width: 10em;
+            height: 10em;
             transition: 0.3s linear all;
+
+        }
+
+        .keypad-controls-container {
+            position: absolute;
+            width: 7em;
+            margin-top: -4em;
+            height: 8em;
+            right: -0.1em;
+            top: 50%;
+            background: #999;
+            transition: 0.3s linear right;
+        }
+
+        .keypad-controls {
+            position: relative;
+            z-index: 0;
+        }
+
+        .keypad-gap-container, .keypad-controls-grabber-container {
+            position: absolute;
+            right: 0;
+            top: 50%;
+        }
+
+        .keypad-gap, .keypad-controls-grabber {
+            margin-top: -4em;
+            height: 8em;
+            width: 0.5em;
+            background: #999;
+            z-index: 3;
+            position: relative;
+            border-radius: 0.5em 0 0 0.5em;
+        }
+
+        .keypad-controls-grabber {
+            height: 7.8em;
+            background: #ccc;
+            border-left: 0.1em solid #aaa;
+            border-top: 0.1em solid #aaa;
+            border-bottom: 0.1em solid #aaa;
+            z-index: 5;
+            cursor: pointer;
+        }
+
+        .slide-out {
+            right: -7em;
         }
 
         .icon-sized {
@@ -88,6 +144,10 @@
 
         .keypad-button:active {
             background: #bbb;
+        }
+
+        .sound {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -195,28 +255,44 @@
                 <li class="code-line-2 current"></li>
                 <li class="code-line-3"></li>
                 <li class="code-line-4"></li>
+                <li class="code-line-5"></li>
+                <li class="code-line-6"></li>
             </ul>
         </div>
-        <div class="keypad icon-sized">
-            <button class="keypad-button" data-key="1">1</button>
-            <button class="keypad-button" data-key="2">2</button>
-            <button class="keypad-button" data-key="3">3</button>
-            <button class="keypad-button" data-key="12">C</button>
+        <div class="keypad-container icon-sized">
+            <div class="keypad-controls-container">
+                <div class="keypad-controls">
+                    Stuff in here!
+                </div>
+                <div class="keypad-controls-grabber-container">
+                    <div class="keypad-controls-grabber"></div>
+                </div>
+            </div>
+            <div class="keypad">
+                <button class="keypad-button" data-key="1">1</button>
+                <button class="keypad-button" data-key="2">2</button>
+                <button class="keypad-button" data-key="3">3</button>
+                <button class="keypad-button" data-key="12">C</button>
             
-            <button class="keypad-button" data-key="4">4</button>
-            <button class="keypad-button" data-key="5">5</button>
-            <button class="keypad-button" data-key="6">6</button>
-            <button class="keypad-button" data-key="13">D</button>
+                <button class="keypad-button" data-key="4">4</button>
+                <button class="keypad-button" data-key="5">5</button>
+                <button class="keypad-button" data-key="6">6</button>
+                <button class="keypad-button" data-key="13">D</button>
 
-            <button class="keypad-button" data-key="7">7</button>
-            <button class="keypad-button" data-key="8">8</button>
-            <button class="keypad-button" data-key="9">9</button>
-            <button class="keypad-button" data-key="14">E</button>
+                <button class="keypad-button" data-key="7">7</button>
+                <button class="keypad-button" data-key="8">8</button>
+                <button class="keypad-button" data-key="9">9</button>
+                <button class="keypad-button" data-key="14">E</button>
 
-            <button class="keypad-button" data-key="10">A</button>
-            <button class="keypad-button" data-key="0">0</button>
-            <button class="keypad-button" data-key="11">B</button>
-            <button class="keypad-button" data-key="15">F</button>
+                <button class="keypad-button" data-key="10">A</button>
+                <button class="keypad-button" data-key="0">0</button>
+                <button class="keypad-button" data-key="11">B</button>
+                <button class="keypad-button" data-key="15">F</button>
+            
+                <div class="keypad-gap-container">
+                    <div class="keypad-gap"></div>                
+                </div>
+            </div>
         </div>
     </body>
 </html>

@@ -114,7 +114,7 @@ define(["require", "exports"], function(require, exports) {
                     case 0xEE:
                         return this.iRet(instruction);
                     default:
-                        return "SYS " + hexPad(instruction.NNN, 3);
+                        return instruction.NNN === 0 ? "-------" : "SYS " + hexPad(instruction.NNN, 3);
                 }
             };
             Disassembler.prototype.iDrawSprite = function (instruction) {

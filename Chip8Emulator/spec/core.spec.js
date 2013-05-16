@@ -12,13 +12,15 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
                 var stack;
                 var timers;
                 var screen;
+                var keypad;
                 beforeEach(function () {
                     registers = createRegisterSpy();
                     stack = createStackSpy();
                     memory = createMemorySpy();
                     timers = createTimersSpy();
                     screen = createScreenSpy();
-                    core = new Chip8.Core(registers, stack, memory, timers, screen);
+                    keypad = createKeypadSpy();
+                    core = new Chip8.Core(registers, stack, memory, timers, screen, keypad);
                 });
                 it('should execute the 00E0 - clear screen instruction', function () {
                     core.execute(createInstruction(0x00, 0xE0));
@@ -245,13 +247,59 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
                         2: 25,
                         "I": 0x700
                     });
+                    screen.draw.andReturn(1);
                     core.execute(createInstruction(0xD1, 0x25));
                     expect(screen.draw).toHaveBeenCalledWith(10, 25, expectedSprite);
+                    expect(registers.write).toHaveBeenCalledWith(0xf, 1);
+                    registers.write.reset();
+                    screen.draw.andReturn(0);
+                    core.execute(createInstruction(0xD1, 0x25));
+                    expect(registers.write).toHaveBeenCalledWith(0xf, 0);
+                });
+                it('should execute the EX9E - skip if key X is pressed instruction', function () {
+                    registers.fakeValues({
+                        1: 0,
+                        5: 4,
+                        "PC": 0x200
+                    });
+                    keypad.fakeKeys({
+                        0: 1,
+                        4: 0
+                    });
+                    core.execute(createInstruction(0xE1, 0x9E));
+                    expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
+                    registers.write.reset();
+                    core.execute(createInstruction(0xE5, 0x9E));
+                    expect(registers.write).not.toHaveBeenCalled();
+                });
+                it('should execute the EXA1 - skip if key X is not pressed instruction', function () {
+                    registers.fakeValues({
+                        1: 8,
+                        5: 3,
+                        "PC": 0x200
+                    });
+                    keypad.fakeKeys({
+                        3: 1,
+                        8: 0
+                    });
+                    core.execute(createInstruction(0xE1, 0xA1));
+                    expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
+                    registers.write.reset();
+                    core.execute(createInstruction(0xE5, 0xA1));
+                    expect(registers.write).not.toHaveBeenCalled();
                 });
                 it('should execute the FX07 - set X to delay timer instruction', function () {
                     timers.getDelay.andReturn(0xD5);
                     core.execute(createInstruction(0xF3, 0x07));
                     expect(registers.write).toHaveBeenCalledWith(3, 0xd5);
+                });
+                it('should execute the FX0A - await keypress and store in X instruction', function () {
+                    core.execute(createInstruction(0xF3, 0x0A));
+                    expect(core.halted).toBe(true);
+                    expect(registers.write).not.toHaveBeenCalledWith(3, 0xA);
+                    keypad.fakeKeypress(0xA);
+                    expect(core.halted).toBe(false);
+                    expect(registers.write).toHaveBeenCalledWith(3, 0xA);
                 });
                 it('should execute the FX15 - set delay timer to X instruction', function () {
                     registers.fakeValues({
@@ -420,6 +468,28 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
             "draw"
         ]);
         return screen;
+    }
+    function createKeypadSpy() {
+        var keypad = jasmine.createSpyObj("keypad", [
+            "read"
+        ]);
+        keypad.fakeKeys = function (keys) {
+            keypad.read.andCallFake(function (key) {
+                return keys[key];
+            });
+        };
+        var eventCallback;
+        keypad.onKeyDown = {
+            subscribe: function (callback) {
+                eventCallback = callback;
+            }
+        };
+        keypad.fakeKeypress = function (key) {
+            if(eventCallback) {
+                eventCallback(key);
+            }
+        };
+        return keypad;
     }
     function createRegisterSpy() {
         var registers = jasmine.createSpyObj("registers", [
