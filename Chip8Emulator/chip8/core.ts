@@ -142,13 +142,13 @@ export module chip8 {
         }
 
         private iShiftXRightWithCarry(instruction: decoderModule.chip8.Instruction) {
-            var oldValue = this.registers.read(instruction.nibbles[1]);
+            var oldValue = this.registers.read(instruction.nibbles[2]);
             this.registers.vF = oldValue & 0x01;
             this.registers.write(instruction.nibbles[1], oldValue >> 1);
         }
 
         private iShiftXLeftWithCarry(instruction: decoderModule.chip8.Instruction) {
-            var oldValue = this.registers.read(instruction.nibbles[1]);
+            var oldValue = this.registers.read(instruction.nibbles[2]);
             this.registers.vF = (oldValue >> 7) & 0x01;
             this.registers.write(instruction.nibbles[1], (oldValue << 1) & 0xFF);
         }

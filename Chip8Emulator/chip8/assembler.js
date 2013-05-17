@@ -9,7 +9,13 @@ define(["require", "exports"], function(require, exports) {
                 this.mapInstructions();
             }
             Disassembler.prototype.disassemble = function (instruction) {
-                return this.instructions[instruction.nibbles[0]].call(this, instruction);
+                var result;
+                try  {
+                    result = this.instructions[instruction.nibbles[0]].call(this, instruction);
+                } catch (ex) {
+                    result = "-----";
+                }
+                return result;
             };
             Disassembler.prototype.iClearScreen = function (instruction) {
                 return "CLS";

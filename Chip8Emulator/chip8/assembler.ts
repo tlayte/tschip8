@@ -11,7 +11,13 @@ export module chip8 {
         }
 
         disassemble(instruction: decoderModule.chip8.Instruction): string {
-            return this.instructions[instruction.nibbles[0]].call(this, instruction);
+            var result;
+                try {
+                    result = this.instructions[instruction.nibbles[0]].call(this, instruction);
+                } catch (ex) {
+                    result = "-----";
+                }
+                return result;
         }
 
         private iClearScreen(instruction: decoderModule.chip8.Instruction) {

@@ -40,6 +40,9 @@ define(["require", "exports", "chip8/event"], function(require, exports, __event
                 return collision;
             };
             Screen.prototype.setPixel = function (x, y, value) {
+                if(value === 0) {
+                    return -1;
+                }
                 while(x >= this.width) {
                     x -= this.width;
                 }
@@ -47,9 +50,7 @@ define(["require", "exports", "chip8/event"], function(require, exports, __event
                     y -= this.height;
                 }
                 var addr = x + y * this.width;
-                var oldValue = this._pixels[addr];
-                this._pixels[addr] = oldValue ^ value;
-                return oldValue === this._pixels[addr] ? -1 : this._pixels[addr];
+                return this._pixels[addr] ^= value;
             };
             Screen.prototype.getPixels = function () {
                 return this._pixels.slice(0);

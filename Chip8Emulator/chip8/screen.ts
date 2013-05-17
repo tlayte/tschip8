@@ -41,6 +41,9 @@ export module chip8{
         }
 
         private setPixel(x: number, y: number, value: number): number {
+            if (value === 0) {
+                return -1;
+            }
             while (x >= this.width) {
                 x -= this.width;
             }
@@ -49,9 +52,8 @@ export module chip8{
                 y -= this.height;
             }
             var addr = x + y * this.width;
-            var oldValue = this._pixels[addr];
-            this._pixels[addr] = oldValue ^ value;
-            return oldValue === this._pixels[addr] ? -1 : this._pixels[addr];
+            
+            return this._pixels[addr] ^= value;
         }
 
         getPixels(): number[]{

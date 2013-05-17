@@ -84,10 +84,13 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
                 });
                 it('should execute the 7XNN - add NN to X instruction', function () {
                     registers.fakeValues({
-                        1: 0x20
+                        1: 0x20,
+                        2: 0x5
                     });
                     core.execute(createInstruction(0x71, 0x25));
+                    core.execute(createInstruction(0x72, 0x03));
                     expect(registers.write).toHaveBeenCalledWith(1, 0x45);
+                    expect(registers.write).toHaveBeenCalledWith(2, 0x08);
                     registers.write.reset();
                     core.execute(createInstruction(0x71, 0xFF));
                     expect(registers.write).toHaveBeenCalledWith(1, 0x1F);

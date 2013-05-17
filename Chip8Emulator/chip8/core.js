@@ -116,12 +116,12 @@ define(["require", "exports"], function(require, exports) {
                 this.registers.write(instruction.nibbles[1], newValue & 0xff);
             };
             Core.prototype.iShiftXRightWithCarry = function (instruction) {
-                var oldValue = this.registers.read(instruction.nibbles[1]);
+                var oldValue = this.registers.read(instruction.nibbles[2]);
                 this.registers.vF = oldValue & 0x01;
                 this.registers.write(instruction.nibbles[1], oldValue >> 1);
             };
             Core.prototype.iShiftXLeftWithCarry = function (instruction) {
-                var oldValue = this.registers.read(instruction.nibbles[1]);
+                var oldValue = this.registers.read(instruction.nibbles[2]);
                 this.registers.vF = (oldValue >> 7) & 0x01;
                 this.registers.write(instruction.nibbles[1], (oldValue << 1) & 0xFF);
             };

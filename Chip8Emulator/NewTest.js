@@ -33,47 +33,37 @@ define(["require", "exports", "chip8/decoder", "chip8/registers", "chip8/stack",
         sound.preload = "auto";
         sound.src = "beep.mp3";
         loadCode();
-        registers.onWrite.subscribe(function (register, value) {
-            $(".variable-" + register + " .variable-value").text(value.toString(16).toUpperCase());
-            if(register === "PC") {
-                displayAssembly();
-            }
-        });
-        timers.onWrite.subscribe(function (timer, value) {
-            $(".variable-" + timer + " .variable-value").text(hexPad(value, 2));
-        });
-        timers.onStartSound.subscribe(function () {
-            $(".sound").addClass("current");
-            sound.currentTime = 1;
-            sound.play();
-        });
-        timers.onStopSound.subscribe(function () {
-            $(".sound").removeClass("current");
-            sound.pause();
-        });
-        stack.onWrite.subscribe(function (SP, value) {
-            $(".variable-SP .variable-value").text(hexPad(SP, 1));
-        });
         registers.reset();
-        function tick() {
-            timers.tick();
+        function tickCore() {
             if(!core.halted) {
                 var instruction = decoder.getNext();
                 core.execute(instruction);
             }
         }
+        function tickTimer() {
+            timers.tick();
+        }
         $(".cycle").click(function () {
-            tick();
+            tickTimer();
+            tickCore();
         });
         var clock = null;
+        var ticker = null;
         $(".start").click(function () {
             if(clock == null) {
                 clock = setInterval(function () {
-                    tick();
+                    for(var i = 0; i < 20; i++) {
+                        tickCore();
+                    }
+                }, 0);
+                ticker = setInterval(function () {
+                    tickTimer();
                 }, 16);
             } else {
                 clearInterval(clock);
+                clearInterval(ticker);
                 clock = null;
+                ticker = null;
             }
         });
         $(".keypad").click(function () {
@@ -102,6 +92,35 @@ define(["require", "exports", "chip8/decoder", "chip8/registers", "chip8/stack",
         $(".keypad-controls-grabber").click(function () {
             $(".keypad-controls-container").toggleClass("slide-out");
         });
+        var canvas = $("#display")[0];
+        var ctx = canvas.getContext('2d');
+        screen.onClear.subscribe(function () {
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(0, 0, 128, 64);
+        });
+        screen.onDraw.subscribe(function () {
+            ctx.beginPath();
+            var pixels = screen.getPixels();
+            ctx.fillStyle = "rgba(0,0,0,0.3)";
+            for(var i = 0; i < pixels.length; i++) {
+                if(pixels[i] == 0) {
+                    var x = i % 64;
+                    var y = i >> 6;
+                    ctx.rect(x * 2, y * 2, 2, 2);
+                }
+            }
+            ctx.fill();
+            ctx.beginPath();
+            ctx.fillStyle = "#00FF00";
+            for(var i = 0; i < pixels.length; i++) {
+                if(pixels[i] == 1) {
+                    var x = i % 64;
+                    var y = i >> 6;
+                    ctx.rect(x * 2, y * 2, 2, 2);
+                }
+            }
+            ctx.fill();
+        });
         $(".reset").click(function () {
             if(clock) {
                 clearInterval(clock);
@@ -115,46 +134,154 @@ define(["require", "exports", "chip8/decoder", "chip8/registers", "chip8/stack",
         });
     });
     function loadCode() {
-        memory.write(0x200, 0x60);
-        memory.write(0x201, 0x12);
-        memory.write(0x202, 0x60);
-        memory.write(0x203, 0x42);
-        memory.write(0x204, 0x24);
-        memory.write(0x205, 0x04);
-        memory.write(0x404, 0xA6);
-        memory.write(0x405, 0x00);
-        memory.write(0x406, 0x00);
-        memory.write(0x407, 0xEE);
-        memory.write(0x206, 0xF5);
-        memory.write(0x207, 0x65);
-        memory.write(0x208, 0x85);
-        memory.write(0x209, 0x30);
-        memory.write(0x20a, 0x85);
-        memory.write(0x20b, 0x44);
-        memory.write(0x600, 1);
-        memory.write(0x601, 2);
-        memory.write(0x602, 3);
-        memory.write(0x603, 4);
-        memory.write(0x604, 5);
-        memory.write(0x20c, 0x17);
-        memory.load(0x700, [
+        memory.reset();
+        memory.load(0x200, [
+            0x60, 
+            0x0A, 
+            0x65, 
+            0x05, 
+            0x66, 
+            0x0A, 
+            0x67, 
+            0x0F, 
             0x68, 
-            0x20, 
-            0x69, 
-            0x10, 
-            0xf8, 
+            0x14, 
+            0x61, 
+            0x01, 
+            0x62, 
+            0x01, 
+            0x63, 
+            0x01, 
+            0x64, 
+            0x01, 
+            0x60, 
+            0x0A, 
+            0xA2, 
+            0x78, 
+            0xD0, 
+            0x56, 
+            0x70, 
+            0x0A, 
+            0xA2, 
+            0x7E, 
+            0xD0, 
+            0x66, 
+            0x70, 
+            0x0A, 
+            0xA2, 
+            0x84, 
+            0xD0, 
+            0x76, 
+            0x70, 
+            0x0A, 
+            0xA2, 
+            0x8A, 
+            0xD0, 
+            0x86, 
+            0x6A, 
+            0x03, 
+            0xFA, 
             0x15, 
-            0xf9, 
-            0x18, 
-            0xfa, 
-            0x07, 
-            0x3a, 
-            0x00, 
-            0x17, 
-            0x08, 
-            0x17, 
-            0x04
+            0x60, 
+            0x0A, 
+            0xA2, 
+            0x78, 
+            0xD0, 
+            0x56, 
+            0x45, 
+            0x14, 
+            0x61, 
+            0xFF, 
+            0x45, 
+            0x01, 
+            0x61, 
+            0x01, 
+            0x85, 
+            0x14, 
+            0xD0, 
+            0x56, 
+            0x70, 
+            0x0A, 
+            0xA2, 
+            0x7E, 
+            0xD0, 
+            0x66, 
+            0x46, 
+            0x14, 
+            0x62, 
+            0xFF, 
+            0x46, 
+            0x01, 
+            0x62, 
+            0x01, 
+            0x86, 
+            0x24, 
+            0xD0, 
+            0x66, 
+            0x70, 
+            0x0A, 
+            0xA2, 
+            0x84, 
+            0xD0, 
+            0x76, 
+            0x47, 
+            0x14, 
+            0x63, 
+            0xFF, 
+            0x47, 
+            0x01, 
+            0x63, 
+            0x01, 
+            0x87, 
+            0x34, 
+            0xD0, 
+            0x76, 
+            0x70, 
+            0x0A, 
+            0xA2, 
+            0x8A, 
+            0xD0, 
+            0x86, 
+            0x48, 
+            0x14, 
+            0x64, 
+            0xFF, 
+            0x48, 
+            0x01, 
+            0x64, 
+            0x01, 
+            0x88, 
+            0x44, 
+            0xD0, 
+            0x86, 
+            0x12, 
+            0x2A, 
+            0xFF, 
+            0x03, 
+            0x0C, 
+            0x30, 
+            0xC0, 
+            0xFF, 
+            0xFF, 
+            0xC0, 
+            0xC0, 
+            0xFC, 
+            0xC0, 
+            0xFF, 
+            0xF0, 
+            0xCC, 
+            0xCC, 
+            0xF0, 
+            0xCC, 
+            0xC3, 
+            0x3C, 
+            0xC3, 
+            0xC3, 
+            0xC3, 
+            0xC3, 
+            0x3C
         ], -1);
+        return;
     }
     function displayAssembly() {
         for(var i = 0; i < 7; i++) {
