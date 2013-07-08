@@ -22,7 +22,8 @@ var core = new coreModule.chip8.Core(registers, stack, memory, timers, screen, k
 var disassembler = new assemblerModule.chip8.Disassembler();
 
 $(document).ready(() => {
-    var sound = <HTMLAudioElement> document.createElement("audio");
+    var sound = <HTMLMediaElement> document.createElement("audio");
+
     sound.loop = true;
     sound.autoplay = false;
     sound.preload = "auto";
