@@ -533,41 +533,81 @@ define(["require", "exports", "chip8/core"], function(require, exports, __coreMo
                     expect(memory.write).toHaveBeenCalledWith(0x701, 0);
                     expect(memory.write).toHaveBeenCalledWith(0x702, 2);
                 });
-                it('should execute the FX55 - store v0 to v5 in memory at I instruction', function () {
-                    registers.fakeValues({
-                        0: 0,
-                        1: 10,
-                        2: 20,
-                        3: 30,
-                        4: 40,
-                        "I": 0x700
+                describe('executing the FX55 - store v0 to vX in memory at I instruction', function () {
+                    describe('with registers 0 to 4 set to [0, 10, 20, 30, 40]', function () {
+                        beforeEach(function () {
+                            registers.fakeValues({
+                                0: 0,
+                                1: 10,
+                                2: 20,
+                                3: 30,
+                                4: 40,
+                                "I": 0x700
+                            });
+                        });
+                        describe('with a length of 4 and a target address of 0x700', function () {
+                            beforeEach(function () {
+                                core.execute(createInstruction(0xF4, 0x55));
+                            });
+                            it('should write 0 to memory at 0x700', function () {
+                                expect(memory.write).toHaveBeenCalledWith(0x700, 0);
+                            });
+                            it('should write 10 to memory at 0x701', function () {
+                                expect(memory.write).toHaveBeenCalledWith(0x701, 10);
+                            });
+                            it('should write 20 to memory at 0x702', function () {
+                                expect(memory.write).toHaveBeenCalledWith(0x702, 20);
+                            });
+                            it('should write 30 to memory at 0x703', function () {
+                                expect(memory.write).toHaveBeenCalledWith(0x703, 30);
+                            });
+                            it('should write 40 to memory at 0x704', function () {
+                                expect(memory.write).toHaveBeenCalledWith(0x704, 40);
+                            });
+                            it('set register I to 0x705', function () {
+                                expect(registers.write).toHaveBeenCalledWith("I", 0x705);
+                            });
+                        });
                     });
-                    core.execute(createInstruction(0xF4, 0x55));
-                    expect(registers.write).toHaveBeenCalledWith("I", 0x705);
-                    expect(memory.write).toHaveBeenCalledWith(0x700, 0);
-                    expect(memory.write).toHaveBeenCalledWith(0x701, 10);
-                    expect(memory.write).toHaveBeenCalledWith(0x702, 20);
-                    expect(memory.write).toHaveBeenCalledWith(0x703, 30);
-                    expect(memory.write).toHaveBeenCalledWith(0x704, 40);
                 });
-                it('should execute the FX65 - load v0 to v5 from memory at I instruction', function () {
-                    memory.fakeValues({
-                        1792: 0,
-                        1793: 10,
-                        1794: 20,
-                        1795: 30,
-                        1796: 40
+                describe('executing the FX65 - load v0 to vX from memory at I instruction', function () {
+                    describe('with memory 0x700 to 0x704 set to [0,10,20,30,40]', function () {
+                        beforeEach(function () {
+                            memory.fakeValues({
+                                1792: 0,
+                                1793: 10,
+                                1794: 20,
+                                1795: 30,
+                                1796: 40
+                            });
+                        });
+                        describe('with a source address of 0x700 and a length of 4', function () {
+                            beforeEach(function () {
+                                registers.fakeValues({
+                                    "I": 0x700
+                                });
+                                core.execute(createInstruction(0xF4, 0x65));
+                            });
+                            it('should set register 0 to 0', function () {
+                                expect(registers.write).toHaveBeenCalledWith(0, 0);
+                            });
+                            it('should set register 1 to 10', function () {
+                                expect(registers.write).toHaveBeenCalledWith(1, 10);
+                            });
+                            it('should set register 2 to 20', function () {
+                                expect(registers.write).toHaveBeenCalledWith(2, 20);
+                            });
+                            it('should set register 3 to 30', function () {
+                                expect(registers.write).toHaveBeenCalledWith(3, 30);
+                            });
+                            it('should set register 4 to 40', function () {
+                                expect(registers.write).toHaveBeenCalledWith(4, 40);
+                            });
+                            it('should set register I to 0x705', function () {
+                                expect(registers.write).toHaveBeenCalledWith("I", 0x705);
+                            });
+                        });
                     });
-                    registers.fakeValues({
-                        "I": 0x700
-                    });
-                    core.execute(createInstruction(0xF4, 0x65));
-                    expect(registers.write).toHaveBeenCalledWith("I", 0x705);
-                    expect(registers.write).toHaveBeenCalledWith(0, 0);
-                    expect(registers.write).toHaveBeenCalledWith(1, 10);
-                    expect(registers.write).toHaveBeenCalledWith(2, 20);
-                    expect(registers.write).toHaveBeenCalledWith(3, 30);
-                    expect(registers.write).toHaveBeenCalledWith(4, 40);
                 });
             });
         })(chip8.spec || (chip8.spec = {}));
