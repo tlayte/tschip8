@@ -24,101 +24,220 @@ export module chip8.spec {
             core = new Chip8.Core(registers, stack, memory, timers, screen, keypad);
         });
 
-        it('should execute the 00E0 - clear screen instruction', () => {
-            core.execute(createInstruction(0x00, 0xE0));
-            expect(screen.clear).toHaveBeenCalled();
-        });
-
-        it('should execute the 00EE - return instruction', () => {
-            stack.pop.andReturn(0x600);
-            core.execute(createInstruction(0x00, 0xEE));
-            expect(registers.write).toHaveBeenCalledWith("PC", 0x600);
-        });
-
-        it('should execute the 1NNN - jmp instruction', () => {
-            core.execute(createInstruction(0x1F, 0x63));
-            expect(registers.write).toHaveBeenCalledWith("PC", 0xF63);
-        });
-
-        it('should execute the 2NNN - call instruction', () => {
-            registers.fakeValues({ "PC": 0x210 });
-            core.execute(createInstruction(0x23, 0x2F));
-            expect(registers.write).toHaveBeenCalledWith("PC", 0x32F);
-            expect(stack.push).toHaveBeenCalledWith(0x210);
-        });
-
-        it('should execute the 3XNN - skip if equal instruction', () => {            
-            registers.fakeValues({
-                1: 0x2f,
-                "PC": 0x200
+        describe('executing the 00E0 - clear screen instruction', () => {
+            beforeEach(() => {
+                core.execute(createInstruction(0x00, 0xE0));
             });
-            core.execute(createInstruction(0x31, 0x2F));
-            expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
-
-            registers.write.reset();
-
-            core.execute(createInstruction(0x31, 0x11));
-            expect(registers.write).not.toHaveBeenCalledWith("PC", 0x202);
+            it('should clear the screen', () => {
+                expect(screen.clear).toHaveBeenCalled();
+            })
         });
 
-        it('should execute the 4XNN - skip if not equal instruction', () => {
-            registers.fakeValues({
-                1: 0x2f,
-                "PC": 0x200
+        describe('executing the 00EE - return instruction', () => {
+            describe('with a return address of 0x600', () => {
+                beforeEach(() => {
+                    stack.pop.andReturn(0x600);
+                    core.execute(createInstruction(0x00, 0xEE));
+                });
+
+                it('should set the PC register to 0x600', () => {
+                    expect(registers.write).toHaveBeenCalledWith("PC", 0x600);
+                });
+            });            
+        });
+
+        describe('executing the 1NNN - jmp instruction', () => {
+            describe('with the address 0xF63', () => {
+                beforeEach(() => {
+                    core.execute(createInstruction(0x1F, 0x63));
+                });
+
+                it('should set the PC register to 0xF63', () => {
+                    expect(registers.write).toHaveBeenCalledWith("PC", 0xF63);
+                });
             });
-            core.execute(createInstruction(0x41, 0x2F));
-            expect(registers.write).not.toHaveBeenCalledWith("PC", 0x202);
-
-            registers.write.reset();
-
-            core.execute(createInstruction(0x41, 0x11));
-            expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
         });
 
-        it('should execute the 5XY0 - skip if X equal Y instruction', () => {
-            registers.fakeValues({
-                1: 0x2f,
-                2: 0x2f,
-                3: 0x11,
-                "PC": 0x200
+        describe('executing the 2NNN - call instruction', () => {
+            describe('with a current PC of 0x210 and a target address of 0x32F', () => {
+                beforeEach(() => {
+                    registers.fakeValues({ "PC": 0x210 });
+                    core.execute(createInstruction(0x23, 0x2F));
+                });
+
+                it('should set the PC register to 0x32F', () => {
+                    expect(registers.write).toHaveBeenCalledWith("PC", 0x32F);
+                });
+
+                it('should push 0x210 on to the stack', () => {
+                    expect(stack.push).toHaveBeenCalledWith(0x210);
+                });
             });
-            core.execute(createInstruction(0x51, 0x20));
-            expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
-
-            registers.write.reset();
-
-            core.execute(createInstruction(0x51, 0x30));
-            expect(registers.write).not.toHaveBeenCalledWith("PC", 0x202);
         });
 
-        it('should execute the 6XNN - set X to NN instruction', () => {
-            core.execute(createInstruction(0x61, 0xF0));
-            expect(registers.write).toHaveBeenCalledWith(1, 0xF0);
+        describe('executing the 3XNN - skip if equal instruction', () => {
+            describe('with a PC of 0x200 and register 1 set to 0x2f', () => {
+                beforeEach(() => {
+                    registers.fakeValues({
+                        1: 0x2f,
+                        "PC": 0x200
+                    });
+                    registers.write.reset();
+                });
+                describe('when checking for a matching value (0x2F)', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x31, 0x2F));
+                    });
+                    it('should set the PC register to 0x202', () => {
+                        expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
+                    });
+                });
+
+                describe('when checking for a non matching value (0x11)', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x31, 0x11));
+                    });
+                    it('should not change the PC register', () => {
+                        expect(registers.write).not.toHaveBeenCalledWith("PC", 0x202);
+                    });
+                });
+            });
         });
 
-        it('should execute the 7XNN - add NN to X instruction', () => {
-            registers.fakeValues({ 1: 0x20, 2: 0x5 });
-            core.execute(createInstruction(0x71, 0x25));
-            core.execute(createInstruction(0x72, 0x03));
-            expect(registers.write).toHaveBeenCalledWith(1, 0x45);
-            expect(registers.write).toHaveBeenCalledWith(2, 0x08);
+        describe('executing the 4XNN - skip if not equal instruction', () => {
+            beforeEach(() => {
+                registers.fakeValues({
+                    1: 0x2f,
+                    "PC": 0x200
+                });
+                registers.write.reset();
+            });
 
-            registers.write.reset();
+            describe('when checking for a matching value', () => {
+                beforeEach(() => {
+                    core.execute(createInstruction(0x41, 0x2F));
+                });
 
-            core.execute(createInstruction(0x71, 0xFF));
-            expect(registers.write).toHaveBeenCalledWith(1, 0x1F);
+                it('should not change the PC register', () => {
+                    expect(registers.write).not.toHaveBeenCalledWith("PC", 0x202);
+                });
+            });
+
+            describe('when checking for a non matching value (0x11)', () => {
+                beforeEach(() => {
+                    core.execute(createInstruction(0x41, 0x11));
+                });
+                it('should set the PC register to 0x202', () => {
+                    expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
+                });
+            });
         });
 
-        it('should execute the 8XY0 - set X to Y instruction', () => {
-            registers.fakeValues({ 5: 0x6A });
-            core.execute(createInstruction(0x81, 0x50));
-            expect(registers.write).toHaveBeenCalledWith(1, 0x6A);
+        describe('executing the 5XY0 - skip if X equal Y instruction', () => {
+            describe('with register values of 1 = 0x2f, 2 = 0x2f, 3 = 0x11 and a PC of 0x200', () => {
+                beforeEach(() => {
+                    registers.fakeValues({
+                        1: 0x2f,
+                        2: 0x2f,
+                        3: 0x11,
+                        "PC": 0x200
+                    });
+                    registers.write.reset();
+                });
+                describe('when checking two matching registers (1 and 2)', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x51, 0x20));
+                    });
+                    it('should set the PC register to 0x202', () => {
+                        expect(registers.write).toHaveBeenCalledWith("PC", 0x202);
+                    });
+                });
+
+                describe('when checking two non matching registers (1 and 3)', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x51, 0x30));
+                    });
+                    it('should not change the PC register', () => {
+                        expect(registers.write).not.toHaveBeenCalledWith("PC", 0x202);
+                    });
+                });
+            });
         });
 
-        it('should execute the 8XY1 - set X to Z or Y instruction', () => {
-            registers.fakeValues({1: 0x0F, 3: 0x70 });
-            core.execute(createInstruction(0x81, 0x31));
-            expect(registers.write).toHaveBeenCalledWith(1, 0x7F);
+        describe('executing the 6XNN - set X to NN instruction', () => {
+            describe('with a value of 0xF0 and a target of register 1', () => {
+                beforeEach(() => {
+                    core.execute(createInstruction(0x61, 0xF0));
+                });
+                it('should set register 1 to 0xF0', () => {
+                    expect(registers.write).toHaveBeenCalledWith(1, 0xF0);
+                });
+            });
+        });
+
+        describe('executing the 7XNN - add NN to X instruction', () => {
+            describe('with the register values 1 = 0x20, 2 = 0x5', () => {
+                beforeEach(() => {
+                    registers.fakeValues({ 1: 0x20, 2: 0x5 });
+                    registers.write.reset();
+                });
+                describe('when adding 0x25 to register 1', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x71, 0x25));
+                    });
+                    it('should set register 1 to 0x45', () => {
+                        expect(registers.write).toHaveBeenCalledWith(1, 0x45);
+                    });
+                });
+                describe('when adding 0x3 to register 2', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x72, 0x03));
+                    });
+                    it('should set register 2 to 0x8', () => {
+                        expect(registers.write).toHaveBeenCalledWith(2, 0x08);
+                    });
+                });
+                describe('when adding 0xFF to register 1', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x71, 0xFF));
+                    });
+                    it('should wrap around and set regist 1 to 0x1F', () => {
+                        expect(registers.write).toHaveBeenCalledWith(1, 0x1F);
+                    });
+                });
+            });
+        });
+
+        describe('executing the 8XY0 - set X to Y instruction', () => {
+            describe('with register 5 set to 0x6A', () => {
+                beforeEach(() => {
+                    registers.fakeValues({ 5: 0x6A });
+                });
+                describe('with a source of register 5 and a target of register 1', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x81, 0x50));
+                    });
+                    it('should set register 1 to 0x6A', () => {
+                        expect(registers.write).toHaveBeenCalledWith(1, 0x6A);
+                    });
+                });
+            });
+        });
+
+        describe('executing the 8XY1 - set X to X or Y instruction', () => {
+            describe('with register values of 1 = 0x0F, 3 = 0x70', () => {
+                beforeEach(() => {
+                    registers.fakeValues({ 1: 0x0F, 3: 0x70 });
+                });
+                describe('with target registers 1 and 3', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x81, 0x31));
+                    });
+                    it('should set register 1 to 0x7F', () => {
+                        expect(registers.write).toHaveBeenCalledWith(1, 0x7F);
+                    });
+                });
+            });
         });
 
         it('should execute the 8XY2 - set X to Z and Y instruction', () => {
@@ -159,17 +278,43 @@ export module chip8.spec {
             expect(registers.write).toHaveBeenCalledWith(1, 0xF0);
         });
 
-        it('should execute the 8XY6 - shift X right by 1 with carry instruction', () => {
-            registers.fakeValues({ 1: 0x04, 2: 0x05 });
-            core.execute(createInstruction(0x81, 0x06));
-            expect(registers.write).toHaveBeenCalledWith(0xf, 0);
-            expect(registers.write).toHaveBeenCalledWith(1, 0x02);
+        describe('executing the 8XY6 - shift Y right by 1 with carry and store in X instruction', () => {
+            beforeEach(() => {
+                registers.write.reset();
+            });
+            describe('with register 1 set to 0x04', () => {
+                beforeEach(() => {
+                    registers.fakeValues({ 1: 0x04 });
+                });
+                describe('when shifting register 1 with a target of register 5', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x85, 0x16));
+                    });
+                    it('should set register 5 to 0x02', () => {
+                        expect(registers.write).toHaveBeenCalledWith(5, 0x02);
+                    });
+                    it('should set register F to previous LSB (0)', () => {
+                        expect(registers.write).toHaveBeenCalledWith(0xf, 0);
+                    });
+                });
+            });
 
-            registers.write.reset();
-
-            core.execute(createInstruction(0x82, 0x06));
-            expect(registers.write).toHaveBeenCalledWith(0xf, 1);
-            expect(registers.write).toHaveBeenCalledWith(2, 0x02);
+            describe('with register 2 set to 0x05', () => {
+                beforeEach(() => {
+                    registers.fakeValues({ 2: 0x05 });
+                });
+                describe('when shifting register 2 with a target of register 4', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x84, 0x26));
+                    });
+                    it('should set register 4 to 0x02', () => {
+                        expect(registers.write).toHaveBeenCalledWith(4, 0x02);
+                    });
+                    it('should set register F to previous LSB (1)', () => {
+                        expect(registers.write).toHaveBeenCalledWith(0xf, 1);
+                    });
+                });
+            });
         });
 
         it('should execute the 8XY7 - sub X from Y storing in X with borrow instruction', () => {
@@ -185,17 +330,43 @@ export module chip8.spec {
             expect(registers.write).toHaveBeenCalledWith(3, 0xF0);
         });
 
-        it('should execute the 8XYE - shift X left by 1 with carry instruction', () => {
-            registers.fakeValues({ 1: 0xF0, 2: 0x04 });
-            core.execute(createInstruction(0x81, 0x0E));
-            expect(registers.write).toHaveBeenCalledWith(0xf, 1);
-            expect(registers.write).toHaveBeenCalledWith(1, 0xE0);
+        describe('executing the 8XYE - shift Y left by 1 with carry and store in X instruction', () => {
+            beforeEach(() => {
+                registers.write.reset();
+            });
+            describe('with register 1 set to 0xF0', () => {
+                beforeEach(() => {
+                    registers.fakeValues({ 1: 0xF0 });
+                });
+                describe('when shifting register 1 with a target of register 5', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x85, 0x1E));
+                    });
+                    it('should set register 5 to 0x02', () => {
+                        expect(registers.write).toHaveBeenCalledWith(5, 0xE0);
+                    });
+                    it('should set register F to previous MSB (1)', () => {
+                        expect(registers.write).toHaveBeenCalledWith(0xf, 1);
+                    });
+                });
+            });
 
-            registers.write.reset();
-
-            core.execute(createInstruction(0x82, 0x0E));
-            expect(registers.write).toHaveBeenCalledWith(0xf, 0);
-            expect(registers.write).toHaveBeenCalledWith(2, 0x08);
+            describe('with register 2 set to 0x04', () => {
+                beforeEach(() => {
+                    registers.fakeValues({ 2: 0x04 });
+                });
+                describe('when shifting register 2 with a target of register 4', () => {
+                    beforeEach(() => {
+                        core.execute(createInstruction(0x84, 0x2E));
+                    });
+                    it('should set register 4 to 0x08', () => {
+                        expect(registers.write).toHaveBeenCalledWith(4, 0x08);
+                    });
+                    it('should set register F to previous MSB (0)', () => {
+                        expect(registers.write).toHaveBeenCalledWith(0xf, 0);
+                    });
+                });
+            });
         });
 
         it('should execute the 9XY0 - skip if X not equal Y instruction', () => {
